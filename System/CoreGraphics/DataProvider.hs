@@ -17,6 +17,6 @@ instance CFType DataProvider where
 foreign import ccall unsafe "CGDataProviderCreateWithFilename"
     c_CGDataProviderCreateWithFilename :: CString -> IO DataProviderRef
 
-createWithFilename :: FilePath -> IO DataProvider
-createWithFilename path = withCString path $ \cstr -> do
+dataProviderWithFilename :: FilePath -> IO DataProvider
+dataProviderWithFilename path = withCString path $ \cstr -> do
     c_CGDataProviderCreateWithFilename cstr >>= retained

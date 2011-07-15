@@ -14,21 +14,21 @@ instance CFType Font where
     cftype = Font
     uncftype (Font p) = p
 
-foreign import ccall "CGFontCreateWithDataProvider"
+foreign import ccall unsafe "CGFontCreateWithDataProvider"
     c_CGFontCreateWithDataProvider :: DataProviderRef -> IO FontRef
 
-createWithDataProvider :: DataProvider -> IO Font
-createWithDataProvider d = cfWith d $ \dp -> c_CGFontCreateWithDataProvider dp >>= retained
+fontWithDataProvider :: DataProvider -> IO Font
+fontWithDataProvider d = cfWith d $ \dp -> c_CGFontCreateWithDataProvider dp >>= retained
 
 type Glyph = CUShort
 
 type CBool = CInt -- ???
 
-foreign import ccall "CGFontGetGlyphAdvances"
+foreign import ccall unsafe "CGFontGetGlyphAdvances"
     c_CGFontGetGlyphAdvances :: FontRef -> Ptr Glyph -> CSize -> Ptr CInt -> IO CBool
 
-getGlyphAdvances :: Font -> [Glyph] -> IO [CInt]
-getGlyphAdvances f glyphs = do
+glyphAdvances :: Font -> [Glyph] -> [CInt]
+glyphAdvances f glyphs = unsafePerformIO $ do
     cfWith f $ \fp -> do
     withArrayLen glyphs $ \len gp -> do
     allocaArray len $ \sp -> do
@@ -37,3 +37,10 @@ getGlyphAdvances f glyphs = do
     -- it just returns zero for each of them.
     when (result /= 1) $ error "getGlyphAdvances: couldn't get advance"
     peekArray len sp
+
+foreign import ccall unsafe "CGFontGetUnitsPerEm"
+    c_CGFontGetUnitsPerEm :: FontRef -> IO CInt
+
+unitsPerEm :: Font -> CInt
+unitsPerEm f = unsafePerformIO $ cfWith f c_CGFontGetUnitsPerEm
+    
