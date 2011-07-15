@@ -10,6 +10,7 @@ module System.CoreFoundation.Base where
 
 import Foreign
 
+#include <stdbool.h>
 
 type CFTypeRef = Ptr ()
 
@@ -43,3 +44,6 @@ defaultAllocatorRef = CFAllocatorRef nullPtr -- or the other one
 unAllocatorRef :: CFAllocatorRef -> Ptr ()
 unAllocatorRef (CFAllocatorRef p) = p
 
+-------
+-- Misc types
+type CBool = #type bool

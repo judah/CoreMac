@@ -59,4 +59,3 @@ Library
   Build-tools:         hsc2hs
 
   frameworks: CoreFoundation, Quartz
-  

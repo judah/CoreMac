@@ -20,9 +20,8 @@ foreign import ccall unsafe "CGFontCreateWithDataProvider"
 fontWithDataProvider :: DataProvider -> IO Font
 fontWithDataProvider d = cfWith d $ \dp -> c_CGFontCreateWithDataProvider dp >>= retained
 
-type Glyph = CUShort
-
-type CBool = CInt -- ???
+type Glyph = CUShort -- TODO: use hsc2hs.  But need GHC's #5106 to be fixed first.
+                    -- (use <ApplicationServices/ApplicationServices.h>)
 
 foreign import ccall unsafe "CGFontGetGlyphAdvances"
     c_CGFontGetGlyphAdvances :: FontRef -> Ptr Glyph -> CSize -> Ptr CInt -> IO CBool
