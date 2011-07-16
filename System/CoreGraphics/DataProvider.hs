@@ -19,4 +19,5 @@ foreign import ccall unsafe "CGDataProviderCreateWithFilename"
 
 dataProviderWithFilename :: FilePath -> IO DataProvider
 dataProviderWithFilename path = withCString path $ \cstr -> do
-    c_CGDataProviderCreateWithFilename cstr >>= retained
+    c_CGDataProviderCreateWithFilename cstr
+        >>= retainOrError ("dataProviderWithFilename: couldn't open file " ++ show path)

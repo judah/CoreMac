@@ -20,7 +20,8 @@ foreign import ccall unsafe "CGFontCreateWithDataProvider"
     c_CGFontCreateWithDataProvider :: DataProviderRef -> IO FontRef
 
 fontWithDataProvider :: DataProvider -> IO Font
-fontWithDataProvider d = cfWith d $ \dp -> c_CGFontCreateWithDataProvider dp >>= retained
+fontWithDataProvider d = cfWith d $ \dp -> c_CGFontCreateWithDataProvider dp 
+                                            >>= retainOrError "fontWithDataProvider: couldn't create font"
 
 type Glyph = #type CGGlyph
 
