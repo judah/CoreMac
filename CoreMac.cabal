@@ -50,6 +50,8 @@ Library
                        System.CoreGraphics.Font
                        System.CoreGraphics.Context
                        System.CoreGraphics.Geometry
+
+  c-sources: cbits/context.c
   
   -- Packages needed in order to build this package.
   Build-depends: base==4.3.*
