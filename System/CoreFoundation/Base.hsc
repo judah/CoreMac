@@ -30,11 +30,18 @@ class CFType a where
     uncftype :: a -> ForeignPtr ()
 
 retained :: CFType a => Ptr () -> IO a
-retained p = cfRetain p >>= fmap cftype . newForeignPtr cfRelease
+retained p
+    -- CFRetain and CFRelease require non-null arguments.
+
+    | p == nullPtr  = fmap cftype $ newForeignPtr_ p
+    | otherwise = cfRetain p >>= fmap cftype . newForeignPtr cfRelease
 
 cfWith :: CFType a => a -> (Ptr () -> IO b) -> IO b
 cfWith = withForeignPtr . uncftype
 
+-- Hack...better for funcs to check it themselves and return Maybe or throw an error.
+cfIsNull :: CFType a => a -> Bool
+cfIsNull p = nullPtr == unsafeForeignPtrToPtr (uncftype p)
 
 newtype CFAllocatorRef = CFAllocatorRef (Ptr ())
 
