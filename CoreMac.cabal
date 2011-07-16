@@ -48,6 +48,8 @@ Library
   Exposed-modules:     System.CoreFoundation.Base
                        System.CoreGraphics.DataProvider
                        System.CoreGraphics.Font
+                       System.CoreGraphics.Context
+                       System.CoreGraphics.Geometry
   
   -- Packages needed in order to build this package.
   Build-depends: base==4.3.*
@@ -59,3 +61,5 @@ Library
   Build-tools:         hsc2hs
 
   frameworks: CoreFoundation, Quartz
+  -- Ugly hack (to get hsc2hs working) until GHC bug #5106 is fixed.
+  cc-options: -march=core2

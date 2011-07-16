@@ -7,6 +7,8 @@ import Control.Monad
 import System.CoreFoundation.Base
 import System.CoreGraphics.DataProvider
 
+#include <ApplicationServices/ApplicationServices.h>
+
 newtype Font = Font (ForeignPtr ())
 type FontRef = Ptr ()
 
@@ -20,8 +22,7 @@ foreign import ccall unsafe "CGFontCreateWithDataProvider"
 fontWithDataProvider :: DataProvider -> IO Font
 fontWithDataProvider d = cfWith d $ \dp -> c_CGFontCreateWithDataProvider dp >>= retained
 
-type Glyph = CUShort -- TODO: use hsc2hs.  But need GHC's #5106 to be fixed first.
-                    -- (should use <ApplicationServices/ApplicationServices.h>)
+type Glyph = #type CGGlyph
 
 foreign import ccall unsafe "CGFontGetGlyphAdvances"
     c_CGFontGetGlyphAdvances :: FontRef -> Ptr Glyph -> CSize -> Ptr CInt -> IO CBool
