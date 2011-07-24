@@ -48,19 +48,25 @@ Library
   Exposed-modules:     System.CoreFoundation.Base
                        System.CoreFoundation.Data
                        System.CoreFoundation.String
+                       System.CoreFoundation.FilePath
 
                        System.CoreGraphics.DataProvider
                        System.CoreGraphics.Font
                        System.CoreGraphics.Context
                        System.CoreGraphics.Geometry
 
+                       System.CoreFoundation.TH
+
   c-sources: cbits/context.c
   
   -- Packages needed in order to build this package.
-  Build-depends: base==4.3.*, bytestring==0.9.*, text==0.11.*
+  Build-depends: base==4.3.*, bytestring==0.9.*, text==0.11.*,
+                 template-haskell==2.5.*
   
   -- Modules not exported by this package.
   -- Other-modules:       
+
+  Extensions: TemplateHaskell
   
   -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
   Build-tools:         hsc2hs
