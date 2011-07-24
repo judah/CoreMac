@@ -19,7 +19,9 @@ type CFTypeRef = Ptr ()
 foreign import ccall "CFRetain" cfRetain :: CFTypeRef -> IO CFTypeRef
 
 -- Releases a Core Foundation object which must not be NULL.
-foreign import ccall "&CFRelease" cfRelease :: FunPtr (CFTypeRef -> IO ())
+foreign import ccall "&CFRelease" cfReleasePtr :: FunPtr (CFTypeRef -> IO ())
+
+foreign import ccall "CFRelease" cfRelease :: CFTypeRef -> IO ()
 
 foreign import ccall "CFEqual" cfEqual :: CFTypeRef -> CFTypeRef -> IO Bool
 -- Also hash and copyDescription and so on.
@@ -34,7 +36,7 @@ retained p
     -- CFRetain and CFRelease require non-null arguments.
 
     | p == nullPtr  = fmap cftype $ newForeignPtr_ p
-    | otherwise = cfRetain p >>= fmap cftype . newForeignPtr cfRelease
+    | otherwise = cfRetain p >>= fmap cftype . newForeignPtr cfReleasePtr
 
 cfWith :: CFType a => a -> (Ptr () -> IO b) -> IO b
 cfWith = withForeignPtr . uncftype
@@ -43,7 +45,7 @@ cfWith = withForeignPtr . uncftype
 retainOrError :: CFType a => String -> Ptr () -> IO a
 retainOrError msg p
     | p==nullPtr = error msg
-    | otherwise = cfRetain p >>= fmap cftype . newForeignPtr cfRelease
+    | otherwise = cfRetain p >>= fmap cftype . newForeignPtr cfReleasePtr
 ----------
 
 newtype CFAllocatorRef = CFAllocatorRef (Ptr ())
@@ -57,5 +59,6 @@ unAllocatorRef (CFAllocatorRef p) = p
 -------
 -- Misc types
 type CBool = #type bool
+type CBoolean = #type Boolean
 
 type CFIndex = #type CFIndex

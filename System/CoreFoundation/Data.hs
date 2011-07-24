@@ -1,3 +1,4 @@
+-- | Interface to the CFData type.  It is toll-free bridged with NSString.
 module System.CoreFoundation.Data where
 
 -- TODO:
@@ -5,6 +6,7 @@ module System.CoreFoundation.Data where
 --  - Int (haskell) index vs Int32 (CoreFoundatino) index?
 --  - some safe way to use CFDataCreateWithBytesNoCopy
 --  - CFDataCreate is immutable, use it to make funcs pure?
+--  - Mutable data?
 
 import Foreign
 import Foreign.C
