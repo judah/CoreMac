@@ -46,6 +46,7 @@ Cabal-version:       >=1.2
 Library
   -- Modules exported by the library.
   Exposed-modules:     System.CoreFoundation.Base
+  Exposed-modules:     System.CoreFoundation.Data
                        System.CoreGraphics.DataProvider
                        System.CoreGraphics.Font
                        System.CoreGraphics.Context
@@ -54,7 +55,7 @@ Library
   c-sources: cbits/context.c
   
   -- Packages needed in order to build this package.
-  Build-depends: base==4.3.*
+  Build-depends: base==4.3.*, bytestring==0.9.*
   
   -- Modules not exported by this package.
   -- Other-modules:       

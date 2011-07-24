@@ -10,7 +10,7 @@ module System.CoreFoundation.Base where
 
 import Foreign
 
-#include <stdbool.h>
+#include <ApplicationServices/ApplicationServices.h>
 
 type CFTypeRef = Ptr ()
 
@@ -57,3 +57,5 @@ unAllocatorRef (CFAllocatorRef p) = p
 -------
 -- Misc types
 type CBool = #type bool
+
+type CFIndex = #type CFIndex
