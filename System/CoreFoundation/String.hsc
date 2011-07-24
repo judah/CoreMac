@@ -7,7 +7,10 @@ module System.CoreFoundation.String where
 --    (maybe through ByteStrings)
 --  - Convert to/from Text and also Prelude.String
 --  - Use CFStringInlineBuffer
---  - endian-ness
+--  - endian-ness is not portable.  
+--    Could use NSByteOrder to figure out Text's endianness...but
+--    probably kCFStringEncodingUTF16 works fine.  Just need to stop
+--    using a DataRef.
 
 import Foreign
 import Foreign.C
