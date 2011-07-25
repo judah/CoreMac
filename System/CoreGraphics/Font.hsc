@@ -5,32 +5,28 @@ import Foreign.C
 import Control.Monad
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.TH
 import System.CoreGraphics.DataProvider
 
 #include <ApplicationServices/ApplicationServices.h>
 
-newtype Font = Font (ForeignPtr ())
-type FontRef = Ptr ()
+declareCFType "Font"
 
-instance CFType Font where
-    cftype = Font
-    uncftype (Font p) = p
-
-foreign import ccall unsafe "CGFontCreateWithDataProvider"
-    c_CGFontCreateWithDataProvider :: DataProviderRef -> IO FontRef
+unsafeForeignImport "CGFontCreateWithDataProvider"
+    [t| DataProviderRef -> IO FontRef |]
 
 fontWithDataProvider :: DataProvider -> IO Font
-fontWithDataProvider d = cfWith d $ \dp -> c_CGFontCreateWithDataProvider dp 
-                                            >>= retainOrError "fontWithDataProvider: couldn't create font"
+fontWithDataProvider d = withCF d $ \dp -> 
+            c_CGFontCreateWithDataProvider dp >>= created
 
 type Glyph = #type CGGlyph
 
-foreign import ccall unsafe "CGFontGetGlyphAdvances"
-    c_CGFontGetGlyphAdvances :: FontRef -> Ptr Glyph -> CSize -> Ptr CInt -> IO CBool
+unsafeForeignImport "CGFontGetGlyphAdvances"
+    [t| FontRef -> Ptr Glyph -> CSize -> Ptr CInt -> IO CBool |]
 
 glyphAdvances :: Font -> [Glyph] -> [CInt]
 glyphAdvances f glyphs = unsafePerformIO $ do
-    cfWith f $ \fp -> do
+    withCF f $ \fp -> do
     withArrayLen glyphs $ \len gp -> do
     allocaArray len $ \sp -> do
     result <- c_CGFontGetGlyphAdvances fp gp (toEnum len) sp
@@ -39,9 +35,8 @@ glyphAdvances f glyphs = unsafePerformIO $ do
     when (result /= 1) $ error "getGlyphAdvances: couldn't get advance"
     peekArray len sp
 
-foreign import ccall unsafe "CGFontGetUnitsPerEm"
-    c_CGFontGetUnitsPerEm :: FontRef -> IO CInt
+unsafeForeignImport "CGFontGetUnitsPerEm" [t| FontRef -> IO CInt |]
 
 unitsPerEm :: Font -> CInt
-unitsPerEm f = unsafePerformIO $ cfWith f c_CGFontGetUnitsPerEm
+unitsPerEm f = unsafePerformIO $ withCF f c_CGFontGetUnitsPerEm
     

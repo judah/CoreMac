@@ -5,19 +5,13 @@ import Foreign
 import Foreign.C
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.TH
 
-newtype DataProvider = DataProvider (ForeignPtr ())
-type DataProviderRef = Ptr ()
+declareCFType "DataProvider"
 
-instance CFType DataProvider where
-    cftype = DataProvider
-    uncftype (DataProvider p) = p
-
-
-foreign import ccall unsafe "CGDataProviderCreateWithFilename"
-    c_CGDataProviderCreateWithFilename :: CString -> IO DataProviderRef
+unsafeForeignImport "CGDataProviderCreateWithFilename"
+    [t| CString -> IO DataProviderRef |]
 
 dataProviderWithFilename :: FilePath -> IO DataProvider
 dataProviderWithFilename path = withCString path $ \cstr -> do
-    c_CGDataProviderCreateWithFilename cstr
-        >>= retainOrError ("dataProviderWithFilename: couldn't open file " ++ show path)
+    c_CGDataProviderCreateWithFilename cstr >>= created

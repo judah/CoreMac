@@ -27,25 +27,30 @@ foreign import ccall "CFEqual" cfEqual :: CFTypeRef -> CFTypeRef -> IO Bool
 -- Also hash and copyDescription and so on.
 --
 
+-- Unsafe to access these directly.
 class CFType a where
     cftype :: ForeignPtr () -> a
     uncftype :: a -> ForeignPtr ()
+    typeName :: a -> String
 
-retained :: CFType a => Ptr () -> IO a
-retained p
-    -- CFRetain and CFRelease require non-null arguments.
+-- | For return values which we own (Create, Copy)
+created :: forall a . CFType a => CFTypeRef -> IO a
+created p
+    -- CFRetain, CFRelease require non-null arguments.
+    | p == nullPtr = error $ "created: null object of type " ++ typeName (undefined :: a)
+    | otherwise = fmap cftype $ newForeignPtr cfReleasePtr p
 
-    | p == nullPtr  = fmap cftype $ newForeignPtr_ p
+-- | For return values which we don't own (e.g., Get) 
+-- We retain them in the Haskell GC.
+retain :: forall a . CFType a => CFTypeRef -> IO a
+retain p
+    -- CFRetain, CFRelease require non-null arguments.
+    | p == nullPtr = error $ "retain: null object of type " ++ typeName (undefined :: a)
     | otherwise = cfRetain p >>= fmap cftype . newForeignPtr cfReleasePtr
 
-cfWith :: CFType a => a -> (Ptr () -> IO b) -> IO b
-cfWith = withForeignPtr . uncftype
+withCF :: CFType a => a -> (Ptr () -> IO b) -> IO b
+withCF = withForeignPtr . uncftype
 
--- Error if nonzero.
-retainOrError :: CFType a => String -> Ptr () -> IO a
-retainOrError msg p
-    | p==nullPtr = error msg
-    | otherwise = cfRetain p >>= fmap cftype . newForeignPtr cfReleasePtr
 ----------
 
 newtype CFAllocatorRef = CFAllocatorRef (Ptr ())

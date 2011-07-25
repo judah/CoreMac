@@ -16,6 +16,7 @@ import Foreign
 import Foreign.C
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.TH
 import System.CoreFoundation.Data
 
 import Prelude hiding (String)
@@ -26,13 +27,7 @@ import Data.Text.Foreign (useAsPtr, fromPtr)
 
 #include <CoreFoundation/CFString.h>
 
-
-newtype String = String (ForeignPtr ())
-type CFStringRef = Ptr ()
-
-instance CFType String where
-    cftype = String
-    uncftype (String p) = p
+declareCFType "String"
 
 type CFStringEncoding = #type CFStringEncoding
 
@@ -45,15 +40,15 @@ kCFStringEncodingUTF16LE = #const kCFStringEncodingUTF16LE
 kCFStringEncodingUTF16BE :: CFStringEncoding
 kCFStringEncodingUTF16BE = #const kCFStringEncodingUTF16BE
 
-foreign import ccall unsafe "CFStringCreateWithBytes"
-    c_CFStringCreateWithBytes :: CFAllocatorRef -> Ptr Word8 -> CFIndex
+unsafeForeignImport "CFStringCreateWithBytes"
+    [t| CFAllocatorRef -> Ptr Word8 -> CFIndex
                                     -> CFStringEncoding
-                                    -> CBoolean -> IO CFStringRef
+                                    -> CBoolean -> IO StringRef |]
 
-foreign import ccall unsafe "CFStringCreateExternalRepresentation"
-    c_CFStringCreateExternalRepresentation :: CFAllocatorRef
-                -> CFStringRef -> CFStringEncoding -> Word8
-                -> IO CFDataRef
+unsafeForeignImport "CFStringCreateExternalRepresentation"
+    [t| CFAllocatorRef
+                -> StringRef -> CFStringEncoding -> Word8
+                -> IO DataRef |]
 
 
 
@@ -64,11 +59,11 @@ stringFromText t = useAsPtr t $ \p len -> do
                     c_CFStringCreateWithBytes defaultAllocatorRef (castPtr p)
                         (2 * (toEnum $ fromEnum len)) kCFStringEncodingUTF16
                         0 -- Text doesn't add a BOM
-                     >>= retainOrError "stringFromText: couldn't create String."
+                     >>= created
 
 -- | Copies the String into Text.
 stringToText :: String -> IO Text.Text
-stringToText s = cfWith s $ \sp -> do
+stringToText s = withCF s $ \sp -> do
     dp <- c_CFStringCreateExternalRepresentation defaultAllocatorRef sp
                 -- Force endian-ness so it doesn't output a bom
                 -- TODO: breaks on big-endian architectures,

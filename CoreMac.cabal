@@ -48,7 +48,6 @@ Library
   Exposed-modules:     System.CoreFoundation.Base
                        System.CoreFoundation.Data
                        System.CoreFoundation.String
-                       System.CoreFoundation.FilePath
 
                        System.CoreGraphics.DataProvider
                        System.CoreGraphics.Font
@@ -66,7 +65,7 @@ Library
   -- Modules not exported by this package.
   -- Other-modules:       
 
-  Extensions: TemplateHaskell
+  Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
   
   -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
   Build-tools:         hsc2hs
@@ -74,3 +73,5 @@ Library
   frameworks: CoreFoundation, Quartz
   -- Ugly hack (to get hsc2hs working) until GHC bug #5106 is fixed.
   cc-options: -march=core2
+  -- Hack: TH needs this at compile time
+  ghc-options: -framework CoreFoundation
