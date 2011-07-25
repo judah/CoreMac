@@ -53,6 +53,7 @@ Library
                        System.CoreGraphics.Font
                        System.CoreGraphics.Context
                        System.CoreGraphics.Geometry
+                       System.CoreGraphics.AffineTransform
 
                        System.CoreFoundation.TH
 
@@ -66,6 +67,7 @@ Library
   -- Other-modules:       
 
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
+              RecordWildCards
   
   -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
   Build-tools:         hsc2hs
