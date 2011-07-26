@@ -72,7 +72,7 @@ Library
   -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
   Build-tools:         hsc2hs
 
-  frameworks: CoreFoundation, Quartz
+  frameworks: CoreFoundation, Cocoa, Quartz
   -- Ugly hack (to get hsc2hs working) until GHC bug #5106 is fixed.
   cc-options: -march=core2
   -- Hack: TH needs this at compile time
