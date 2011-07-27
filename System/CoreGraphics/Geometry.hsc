@@ -31,7 +31,7 @@ instance Storable Size where
         sizeHeight <- (#peek CGSize, height) p
         return Size {..}
     poke p Size {..} = do
-        (#poke CGSize, width) p sizeHeight
+        (#poke CGSize, width) p sizeWidth
         (#poke CGSize, height) p sizeHeight
 
 
