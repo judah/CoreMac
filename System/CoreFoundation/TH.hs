@@ -1,6 +1,7 @@
 -- | Short-cuts for repeated foreign interfacing
 module System.CoreFoundation.TH (
                     unsafeForeignImport,
+                    foreignExport,
                     declareCFType
                     ) where
 import System.CoreFoundation.Base
@@ -9,6 +10,8 @@ import Language.Haskell.TH
 import Foreign.Ptr
 import Foreign.ForeignPtr
 
+-- "unsafe" in the sense that the foreign code should not call back
+-- into Haskell.
 unsafeForeignImport :: String -> TypeQ -> Q [Dec]
 unsafeForeignImport name qt = do
     t <- qt
@@ -38,6 +41,17 @@ declareCFType name = do
                 ]
     let tySyn = TySynD (mkName $ name ++ "Ref") [] ptr
     return [newtypeD,inst,tySyn]
+
+foreignExport :: String -> TypeQ -> ExpQ -> Q [Dec]
+foreignExport n qt qe = do
+    let name = mkName n
+    t <- qt
+    e <- qe
+    return [ ForeignD $ ExportF CCall n name t
+           , SigD name t
+           , FunD name [Clause [] (NormalB e) []]
+           ]
+
     
 {-
 -- E.g.: foreignImportCore "CGFontCreateWithDataProvider"
