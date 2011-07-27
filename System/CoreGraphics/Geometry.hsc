@@ -28,7 +28,7 @@ instance Storable Size where
     alignment _ = alignment (undefined :: CGFloat)
     peek p = do
         sizeWidth <- (#peek CGSize, width) p
-        sizeHeight <- (#peek CGSize, width) p
+        sizeHeight <- (#peek CGSize, height) p
         return Size {..}
     poke p Size {..} = do
         (#poke CGSize, width) p sizeHeight
