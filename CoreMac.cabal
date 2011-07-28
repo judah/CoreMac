@@ -48,6 +48,7 @@ Library
   Exposed-modules:     System.CoreFoundation.Base
                        System.CoreFoundation.Data
                        System.CoreFoundation.String
+                       System.CoreFoundation.Time
 
                        System.CoreGraphics.DataProvider
                        System.CoreGraphics.Font
