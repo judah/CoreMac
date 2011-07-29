@@ -1,6 +1,6 @@
 module System.CoreFoundation.Time where
 
-import System.CoreFoundation.TH
+import System.CoreFoundation.Internal.TH
 
 #include <CoreFoundation/CoreFoundation.h>
 

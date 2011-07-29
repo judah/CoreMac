@@ -1,18 +1,27 @@
--- CFBase.h header
--- We'll use the Haskell GC to keep objects alive until Haskell-land is
--- done with them.  (CFRetain/CFRelease keep count even if Objective C is GC'd;
--- the only difference is that the object may not be immediately released after its
--- retain count drops to zero.)
---
--- In general, we'll be using the default allocator.
-module System.CoreFoundation.Base where
-
+module System.CoreFoundation.Base(
+                CFType,
+                CFTypeRef,
+                CFObject(),
+                touchCF,
+                withCF,
+                getOwned,
+                getAndRetain,
+                returnAsCopy,
+                -- | Allocators
+                AllocatorRef,
+                defaultAllocatorRef,
+                -- | Miscellaneous type synonyms
+                CBool,
+                CBoolean,
+                CFIndex,
+                ) where
 
 import Foreign
 
-#include <ApplicationServices/ApplicationServices.h>
+import System.CoreFoundation.Internal.Unsafe
 
-type CFTypeRef = Ptr ()
+#include <CoreFoundation/CoreFoundation.h>
+
 
 -- Retains a Core Foundation object.  Returns the input.
 -- If NULL, causes a crash.
@@ -23,47 +32,71 @@ foreign import ccall "&CFRelease" cfReleasePtr :: FunPtr (CFTypeRef -> IO ())
 
 foreign import ccall "CFRelease" cfRelease :: CFTypeRef -> IO ()
 
-foreign import ccall "CFEqual" cfEqual :: CFTypeRef -> CFTypeRef -> IO Bool
--- Also hash and copyDescription and so on.
---
 
--- Unsafe to access these directly.
-class CFType a where
-    cftype :: ForeignPtr () -> a
-    uncftype :: a -> ForeignPtr ()
-    typeName :: a -> String
+-- | Like 'touchForeignPtr', ensures that the object will still be alive
+-- at the given place in the sequence of IO events.
+touchCF :: CFObject a => a -> IO ()
+touchCF = touchForeignPtr . unsafeUnCFObject
 
--- | For return values which we own (Create, Copy)
-created :: forall a . CFType a => CFTypeRef -> IO a
-created p
-    -- CFRetain, CFRelease require non-null arguments.
-    | p == nullPtr = error $ "created: null object of type " ++ typeName (undefined :: a)
-    | otherwise = fmap cftype $ newForeignPtr cfReleasePtr p
+-- | Like 'withForeignPtr', extracts the underlying C type.  It is not safe in general to use the 'CFTypeRef' after the action completes.
+withCF :: CFObject a => a -> (CFTypeRef -> IO b) -> IO b
+withCF = withForeignPtr . unsafeUnCFObject
 
--- | For return values which we don't own (e.g., Get) 
--- We retain them in the Haskell GC.
-retain :: forall a . CFType a => CFTypeRef -> IO a
-retain p
-    -- CFRetain, CFRelease require non-null arguments.
-    | p == nullPtr = error $ "retain: null object of type " ++ typeName (undefined :: a)
-    | otherwise = cfRetain p >>= fmap cftype . newForeignPtr cfReleasePtr
+-- | Returns a Haskell type which references the given Core Foundation C object.
+-- The 'CFTypeRef' must not be null.
+-- 
+-- This function should be used for objects that you own, for example returned from 
+-- a @Create@ or @Copy@ function.  
+-- 
+-- At some point after the Haskell type goes out of 
+-- scope, the C object will be released with @CFRelease@.
+getOwned :: forall a . CFObject a => CFTypeRef -> IO a
+getOwned p
+    | p==nullPtr = error $ "getOwned: null object of type "
+                            ++ typeName (undefined :: a)
+    | otherwise = fmap unsafeCFObject $ newForeignPtr cfReleasePtr p
 
-withCF :: CFType a => a -> (Ptr () -> IO b) -> IO b
-withCF = withForeignPtr . uncftype
+-- | Returns a Haskell type which references the given Core Foundation C object.
+-- The 'CFTypeRef' must not be null.
+-- 
+-- This function should be used for objects that you do not own, for example 
+-- returned from a @Get@ function.  
+-- 
+-- | This function calls @CFRetain@ on its argument.  Then,
+-- at  some point after the Haskell type goes out of 
+-- scope, the C object will be released with @CFRelease@.
+getAndRetain :: forall a . CFObject a => CFTypeRef -> IO a
+getAndRetain p
+    | p==nullPtr = error $ "getAndRetain: null object of type "
+                            ++ typeName (undefined :: a)
+    | otherwise = cfRetain p >>= fmap unsafeCFObject . newForeignPtr cfReleasePtr
+
+
+-- | Returns the underlying C object, after calling an extra @CFRetain@ on it.
+-- 
+-- The consumer of this function must release the returned 'CFTypeRef' using @CFRelease@.  Every call to returnAsCopy must be matched exactly one call to @CFRelease@.
+-- 
+-- The function will not be released until some time after the Haskell type goes out of scope and the matching @CFRelease@ has been performed.
+returnAsCopy :: CFObject a => a -> IO CFTypeRef
+returnAsCopy x = withCF x cfRetain
 
 ----------
 
-newtype CFAllocatorRef = CFAllocatorRef (Ptr ())
+-- | A reference to an allocator object.
+newtype AllocatorRef = AllocatorRef (Ptr ())
 
-defaultAllocatorRef :: CFAllocatorRef
-defaultAllocatorRef = CFAllocatorRef nullPtr -- or the other one
-
-unAllocatorRef :: CFAllocatorRef -> Ptr ()
-unAllocatorRef (CFAllocatorRef p) = p
+-- | The default allocator.
+defaultAllocatorRef :: AllocatorRef
+defaultAllocatorRef = AllocatorRef nullPtr
 
 -------
 -- Misc types
+
+-- | This type corresponds to the C type @bool@.
 type CBool = #type bool
+
+-- | This type corresponds to the C type @Boolean@.
 type CBoolean = #type Boolean
 
+-- | This type corresponds to the C type @CFIndex@.
 type CFIndex = #type CFIndex

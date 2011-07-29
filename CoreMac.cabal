@@ -45,18 +45,22 @@ Cabal-version:       >=1.2
 
 Library
   -- Modules exported by the library.
-  Exposed-modules:     System.CoreFoundation.Base
-                       System.CoreFoundation.Data
-                       System.CoreFoundation.String
-                       System.CoreFoundation.Time
+  Exposed-modules:  
+        System.CoreFoundation
+        System.CoreFoundation.Base
+        System.CoreFoundation.Data
+        System.CoreFoundation.String
+        System.CoreFoundation.Time
 
-                       System.CoreGraphics.DataProvider
-                       System.CoreGraphics.Font
-                       System.CoreGraphics.Context
-                       System.CoreGraphics.Geometry
-                       System.CoreGraphics.AffineTransform
+        System.CoreGraphics
+        System.CoreGraphics.DataProvider
+        System.CoreGraphics.Font
+        System.CoreGraphics.Context
+        System.CoreGraphics.Geometry
+        System.CoreGraphics.AffineTransform
 
-                       System.CoreFoundation.TH
+        System.CoreFoundation.Internal.TH
+        System.CoreFoundation.Internal.Unsafe
 
   c-sources: cbits/context.c
   
@@ -68,7 +72,7 @@ Library
   -- Other-modules:       
 
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
-              RecordWildCards
+              RecordWildCards, EmptyDataDecls
   
   -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
   Build-tools:         hsc2hs

@@ -1,0 +1,8 @@
+something like withOwned, withRetained
+  so that we can control when the release happens.
+
+Lots more of the API
+
+AllocatorRef should be a CFObject?
+
+Rename, since it's not necessarily only for Macs.

@@ -4,7 +4,7 @@ import Foreign
 import Foreign.C
 
 import System.CoreFoundation.Base
-import System.CoreFoundation.TH
+import System.CoreFoundation.Internal.TH
 
 import System.CoreGraphics.Geometry
 import System.CoreGraphics.Font

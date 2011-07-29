@@ -5,7 +5,7 @@ import Foreign
 import Foreign.C
 
 import System.CoreFoundation.Base
-import System.CoreFoundation.TH
+import System.CoreFoundation.Internal.TH
 
 declareCFType "DataProvider"
 
@@ -14,4 +14,4 @@ unsafeForeignImport "CGDataProviderCreateWithFilename"
 
 dataProviderWithFilename :: FilePath -> IO DataProvider
 dataProviderWithFilename path = withCString path $ \cstr -> do
-    c_CGDataProviderCreateWithFilename cstr >>= created
+    c_CGDataProviderCreateWithFilename cstr >>= getOwned

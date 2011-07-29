@@ -5,7 +5,7 @@ import Foreign.C
 import Control.Monad
 
 import System.CoreFoundation.Base
-import System.CoreFoundation.TH
+import System.CoreFoundation.Internal.TH
 import System.CoreGraphics.DataProvider
 
 #include <ApplicationServices/ApplicationServices.h>
@@ -17,7 +17,7 @@ unsafeForeignImport "CGFontCreateWithDataProvider"
 
 fontWithDataProvider :: DataProvider -> IO Font
 fontWithDataProvider d = withCF d $ \dp -> 
-            c_CGFontCreateWithDataProvider dp >>= created
+            c_CGFontCreateWithDataProvider dp >>= getOwned
 
 type Glyph = #type CGGlyph
 

@@ -1,10 +1,10 @@
 -- | Short-cuts for repeated foreign interfacing
-module System.CoreFoundation.TH (
+module System.CoreFoundation.Internal.TH (
                     unsafeForeignImport,
                     foreignExport,
                     declareCFType
                     ) where
-import System.CoreFoundation.Base
+import System.CoreFoundation.Internal.Unsafe
 
 import Language.Haskell.TH
 import Foreign.Ptr
@@ -21,22 +21,22 @@ unsafeForeignImport name qt = do
 -- newtype CFString = CFString (ForeignPtr ())
 -- instance CFType CFString where
 --      typeName _ = "CFString"
---      cftype = CFString
---      uncftype (CFString p) = p
+--      unsafeCFObject = CFString
+--      unsafeUnCFObject (CFString p) = p
 -- type CFStringRef = Ptr ()
 declareCFType :: String -> Q [Dec]
 declareCFType name = do
     let n = mkName name
     p <- newName "p"
-    fptr <- [t|ForeignPtr ()|]
-    ptr <- [t| Ptr ()|]
+    fptr <- [t|ForeignPtr CFType|]
+    ptr <- [t| CFTypeRef |]
     let newtypeD = NewtypeD [] n [] (NormalC n [(NotStrict, fptr)]) []
-    let inst = InstanceD [] (ConT ''CFType `AppT` ConT n)
+    let inst = InstanceD [] (ConT ''CFObject `AppT` ConT n)
                 [ FunD 'typeName [Clause [WildP]
                                     (NormalB $ LitE $ StringL name)
                                     []]
-                , FunD 'cftype [Clause [] (NormalB $ ConE n) []]
-                , FunD 'uncftype [Clause [ConP n [VarP p]]
+                , FunD 'unsafeCFObject [Clause [] (NormalB $ ConE n) []]
+                , FunD 'unsafeUnCFObject [Clause [ConP n [VarP p]]
                                     (NormalB $ VarE p) []]
                 ]
     let tySyn = TySynD (mkName $ name ++ "Ref") [] ptr

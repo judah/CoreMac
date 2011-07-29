@@ -12,7 +12,7 @@ import Foreign
 import Foreign.C
 
 import System.CoreFoundation.Base
-import System.CoreFoundation.TH
+import System.CoreFoundation.Internal.TH
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Unsafe as UnsafeB
@@ -24,7 +24,7 @@ unsafeForeignImport "CFDataGetBytePtr" [t| DataRef -> IO (Ptr Word8)|]
 unsafeForeignImport "CFDataGetLength" [t| DataRef -> IO CFIndex |]
 
 unsafeForeignImport "CFDataCreate"
-    [t| CFAllocatorRef -> Ptr CChar -> CFIndex -> IO DataRef |]
+    [t| AllocatorRef -> Ptr CChar -> CFIndex -> IO DataRef |]
 
 -- | Directly access the internal bytes of the Data.
 -- It is not safe to use the CStringLen outside of the block.
@@ -42,7 +42,7 @@ dataToByteString d = withData d B.packCStringLen
 dataFromByteString :: B.ByteString -> IO Data
 dataFromByteString b = UnsafeB.unsafeUseAsCStringLen b $ \(p,len) ->
                         c_CFDataCreate defaultAllocatorRef p (toEnum len)
-                            >>= created
+                            >>= getOwned
 
 -- | Get the length of a Data object.
 dataLength :: Data -> IO Int
