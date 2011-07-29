@@ -1,5 +1,9 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
-module System.CoreGraphics.DataProvider where
+module System.CoreGraphics.DataProvider(
+                    DataProvider,
+                    DataProviderRef,
+                    dataProviderWithFilename,
+                    ) where
 
 import Foreign
 import Foreign.C

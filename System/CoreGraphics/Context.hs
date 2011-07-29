@@ -1,4 +1,12 @@
-module System.CoreGraphics.Context where
+module System.CoreGraphics.Context(
+                Context,
+                ContextRef,
+                fillRect,
+                showGlyphsAtPoint,
+                setFont,
+                setFontSize,
+                setTextMatrix,
+                ) where
 
 import Foreign
 import Foreign.C

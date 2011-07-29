@@ -1,4 +1,7 @@
-module System.CoreFoundation.Time where
+module System.CoreFoundation.Time(
+                AbsoluteTime,
+                getCurrent,
+                ) where
 
 import System.CoreFoundation.Internal.TH
 

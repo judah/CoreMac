@@ -5,7 +5,7 @@ import Foreign
 -- | Dummy type for Core Foundation objects.
 data CFType
 
--- | All Core Foundation API functions handle pointers to objects.  For example, 
+-- | A reference (i.e., pointer) to a Core Foundation object.  For example,
 -- the C type @CFDataRef@ is represented in Haskell by the @DataRef@ type and marshalled to the @Data@ type.
 type CFTypeRef = Ptr CFType
 

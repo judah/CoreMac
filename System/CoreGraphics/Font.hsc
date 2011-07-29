@@ -1,4 +1,11 @@
-module System.CoreGraphics.Font where
+module System.CoreGraphics.Font(
+                    Font,
+                    FontRef,
+                    fontWithDataProvider,
+                    Glyph,
+                    glyphAdvances,
+                    unitsPerEm,
+                    ) where
 
 import Foreign
 import Foreign.C

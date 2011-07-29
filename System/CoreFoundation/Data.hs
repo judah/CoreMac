@@ -1,5 +1,12 @@
 -- | Interface to the CFData type.  It is toll-free bridged with NSString.
-module System.CoreFoundation.Data where
+module System.CoreFoundation.Data(
+                Data,
+                DataRef,
+                withData,
+                dataToByteString,
+                dataFromByteString,
+                dataLength,
+                ) where
 
 -- TODO:
 --  - lazy bytestrings?

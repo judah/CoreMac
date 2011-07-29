@@ -1,5 +1,10 @@
 -- | Interface to the CFString type, which is toll-free bridged with NSString.
-module System.CoreFoundation.String where
+module System.CoreFoundation.String(
+                String,
+                StringRef,
+                stringFromText,
+                stringToText,
+                ) where
 
 -- TODO: 
 --  - Mutable?
@@ -23,6 +28,7 @@ import Prelude hiding (String)
 import qualified Prelude as P
 
 import qualified Data.Text as Text
+import qualified Data.Text.Encoding as Encoding
 import Data.Text.Foreign (useAsPtr, fromPtr)
 
 #include <CoreFoundation/CoreFoundation.h>
@@ -66,16 +72,10 @@ stringToText :: String -> IO Text.Text
 stringToText s = withCF s $ \sp -> do
     d <- c_CFStringCreateExternalRepresentation defaultAllocatorRef sp
                 -- Force endian-ness so it doesn't output a bom
-                -- TODO: breaks on big-endian architectures,
-                -- since Text's encoding is platform-dependent
                 kCFStringEncodingUTF16LE
                 (toEnum $ fromEnum '?') -- shouldn't be needed
             >>= getOwned
-    withCF (d::Data) $ \dp -> do
-    p <- c_CFDataGetBytePtr dp
-    len <- c_CFDataGetLength dp
-    t <- fromPtr (castPtr p) (toEnum $ fromEnum $ len `div` 2)
-    return t
+    fmap Encoding.decodeUtf16LE $ dataToByteString d
     
     
 

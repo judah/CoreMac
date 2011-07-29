@@ -7,14 +7,16 @@ import Foreign.Storable
 
 -- | An affine transformation.  
 -- 
---     x' = a x + c y + tx
---     y' = b x + d y + ty
+-- >   x' = a x + c y + tx
+-- >   y' = b x + d y + ty
 -- 
--- Alternately, 
---     T = (a  b  0)
---         (c  d  0)
---         (tx ty 1)
---   and (x' y' 1) = (x y 1) T.    
+-- Alternately:
+-- 
+-- >   T = (a  b  0)
+-- >       (c  d  0)
+-- >       (tx ty 1)
+-- >
+-- > (x' y' 1) = (x y 1) T
 data AffineTransform = AffineTransform {
                                 matrixA, matrixB, matrixC, matrixD,
                                 matrixTX, matrixTY :: !CGFloat
@@ -68,8 +70,8 @@ rotate angle = AffineTransform c s (negate s) c 0 0
 
 
 
--- | (f `compose` g) `applyTransform` p
--- = f `applyTranform` (g `applyTransform` p)
+-- | @(f \`compose\` g) \`applyTransform\` p
+-- = f \`applyTranform\` (g \`applyTransform\` p)@
 compose :: AffineTransform -> AffineTransform -> AffineTransform
 compose t t' = AffineTransform {
                 -- Transform evaluation means multiplying the matrix by a

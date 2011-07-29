@@ -45,8 +45,8 @@ withCF = withForeignPtr . unsafeUnCFObject
 -- | Returns a Haskell type which references the given Core Foundation C object.
 -- The 'CFTypeRef' must not be null.
 -- 
--- This function should be used for objects that you own, for example returned from 
--- a @Create@ or @Copy@ function.  
+-- This function should be used for objects that you own, for example those obtained 
+-- from a @Create@ or @Copy@ function.  
 -- 
 -- At some point after the Haskell type goes out of 
 -- scope, the C object will be released with @CFRelease@.
@@ -60,7 +60,7 @@ getOwned p
 -- The 'CFTypeRef' must not be null.
 -- 
 -- This function should be used for objects that you do not own, for example 
--- returned from a @Get@ function.  
+-- those obtained from a @Get@ function.  
 -- 
 -- | This function calls @CFRetain@ on its argument.  Then,
 -- at  some point after the Haskell type goes out of 
@@ -74,7 +74,7 @@ getAndRetain p
 
 -- | Returns the underlying C object, after calling an extra @CFRetain@ on it.
 -- 
--- The consumer of this function must release the returned 'CFTypeRef' using @CFRelease@.  Every call to returnAsCopy must be matched exactly one call to @CFRelease@.
+-- The consumer of this function must release the returned 'CFTypeRef' using @CFRelease@.  Every call to 'returnAsCopy' must be matched exactly one call to @CFRelease@.
 -- 
 -- The function will not be released until some time after the Haskell type goes out of scope and the matching @CFRelease@ has been performed.
 returnAsCopy :: CFObject a => a -> IO CFTypeRef
