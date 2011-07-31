@@ -1,4 +1,4 @@
--- | Interface to the CFData type.  It is toll-free bridged with NSString.
+-- | Interface to CoreFoundation's @CFData@ C type.  It is toll-free bridged with the @NSData@ type.
 module System.CoreFoundation.Data(
                 Data,
                 DataRef,

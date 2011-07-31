@@ -1,4 +1,4 @@
--- | Interface to the CFString type, which is toll-free bridged with NSString.
+-- | Interface to CoreFoundation's @CFString@ type.  It is toll-free bridged with the @NSString@ class.
 module System.CoreFoundation.String(
                 String,
                 StringRef,
