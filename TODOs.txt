@@ -1,5 +1,9 @@
 something like withOwned, withRetained
   so that we can control when the release happens.
+  BUT it'd be better if the user of a API func could determine this...
+  E.g.: every type takes an STT param (MonadIO m => STT s m Data)
+  and there's a function returnign STT stuff.
+  For now, it's not a huge deal.
 
 Lots more of the API
 
@@ -10,3 +14,5 @@ Rename, since it's not necessarily only for Macs.
 More efficient String marshalling
 
 TODOs in Data module
+
+
