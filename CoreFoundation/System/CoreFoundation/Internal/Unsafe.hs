@@ -3,7 +3,7 @@ module System.CoreFoundation.Internal.Unsafe where
 import Foreign
 
 -- | Dummy type for Core Foundation objects.
-data CFType
+type CFType = ()
 
 -- | A reference (i.e., pointer) to a Core Foundation object.  For example,
 -- the C type @CFDataRef@ is represented in Haskell by the @DataRef@ type and marshalled to the @Data@ type.

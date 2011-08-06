@@ -62,11 +62,10 @@ Library
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
               RecordWildCards, EmptyDataDecls
   
-  -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
-  Build-tools:         hsc2hs
+  Build-tools:         c2hs
 
   frameworks: CoreFoundation
   -- Ugly hack (to get hsc2hs working) until GHC bug #5106 is fixed.
-  cc-options: -march=core2
+  cc-options: -march=core2 -U__BLOCKS__
   -- Hack: TH needs this at compile time
   ghc-options: -framework CoreFoundation
