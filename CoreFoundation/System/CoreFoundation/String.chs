@@ -58,7 +58,7 @@ declareCFType "String"
        kCFStringEncodingUTF32LE as UTF32LE
     } #}
 
-{#fun CFStringCreateWithBytes as createStringWithBytes
+{#fun unsafe CFStringCreateWithBytes as createStringWithBytes
     { withDefaultAllocator- `AllocatorPtr',
       castPtr `Ptr Word8',
       toEnum `Int',
@@ -66,14 +66,14 @@ declareCFType "String"
       `Bool'
     } -> `String' getOwned* #}
 
-{#fun CFStringCreateExternalRepresentation as createExternalRepresentation
+{#fun unsafe CFStringCreateExternalRepresentation as createExternalRepresentation
     { withDefaultAllocator- `AllocatorPtr',
       withCF* `String',
       cvtEnum `StringEncoding',
       cvtEnum `Word8'
     } -> `Data' getOwned* #}
 
-{#fun CFStringCreateFromExternalRepresentation as createFromExternalRepresentation
+{#fun unsafe CFStringCreateFromExternalRepresentation as createFromExternalRepresentation
     { withDefaultAllocator- `AllocatorPtr',
       withCF* `Data',
       cvtEnum `StringEncoding'

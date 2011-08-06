@@ -1,7 +1,8 @@
 module System.CoreGraphics.AffineTransform where
 
 import System.CoreGraphics.Geometry
-import Foreign.Storable
+import Foreign
+import Foreign.C
 
 #include <ApplicationServices/ApplicationServices.h>
 
@@ -23,23 +24,23 @@ data AffineTransform = AffineTransform {
                                 }
 
 instance Storable AffineTransform where
-    sizeOf _ = #size CGAffineTransform
+    sizeOf _ = {#sizeof CGAffineTransform #}
     alignment _ = alignment (undefined :: CGFloat)
     peek p = do
-        matrixA <- (#peek CGAffineTransform, a) p
-        matrixB <- (#peek CGAffineTransform, b) p
-        matrixC <- (#peek CGAffineTransform, c) p
-        matrixD <- (#peek CGAffineTransform, d) p
-        matrixTX <- (#peek CGAffineTransform, tx) p
-        matrixTY <- (#peek CGAffineTransform, ty) p
+        matrixA <- {#get CGAffineTransform->a#} p
+        matrixB <- {#get CGAffineTransform->b#} p
+        matrixC <- {#get CGAffineTransform->c#} p
+        matrixD <- {#get CGAffineTransform->d#} p
+        matrixTX <- {#get CGAffineTransform->tx#} p
+        matrixTY <- {#get CGAffineTransform->ty#} p
         return AffineTransform {..}
     poke p AffineTransform {..} = do
-        (#poke CGAffineTransform, a) p matrixA
-        (#poke CGAffineTransform, b) p matrixB
-        (#poke CGAffineTransform, c) p matrixC
-        (#poke CGAffineTransform, d) p matrixD
-        (#poke CGAffineTransform, tx) p matrixTX
-        (#poke CGAffineTransform, ty) p matrixTY
+        {#set CGAffineTransform->a#} p matrixA
+        {#set CGAffineTransform->b#} p matrixB
+        {#set CGAffineTransform->c#} p matrixC
+        {#set CGAffineTransform->d#} p matrixD
+        {#set CGAffineTransform->tx#} p matrixTX
+        {#set CGAffineTransform->ty#} p matrixTY
 
 -- | For testing:
 applyTransform :: AffineTransform -> Point -> Point

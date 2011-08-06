@@ -50,6 +50,9 @@ Library
         System.CoreGraphics.AffineTransform
 
   c-sources: cbits/context.c
+             cbits/font.c
+  include-dirs: includes
+  includes: context.h font.h
   
   -- Packages needed in order to build this package.
   Build-depends: base==4.3.*, bytestring==0.9.*, text==0.11.*,
@@ -62,11 +65,12 @@ Library
   Extensions: ForeignFunctionInterface, TemplateHaskell
               RecordWildCards, EmptyDataDecls
   
-  -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
-  Build-tools:         hsc2hs
+  Build-tools:         c2hs
 
   frameworks: CoreFoundation, Cocoa, Quartz
   -- Ugly hack (to get hsc2hs working) until GHC bug #5106 is fixed.
-  cc-options: -march=core2
+  cpp-options: -m32
+  cc-options: -march=core2 -U__BLOCKS__ -m32
+  ld-options: -m32
   -- Hack: TH needs this at compile time
   ghc-options: -framework CoreFoundation

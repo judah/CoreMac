@@ -16,34 +16,34 @@ import System.CoreFoundation.Internal.TH
 import System.CoreGraphics.DataProvider
 
 #include <ApplicationServices/ApplicationServices.h>
+#include "font.h"
 
 declareCFType "Font"
 
-unsafeForeignImport "CGFontCreateWithDataProvider"
-    [t| DataProviderRef -> IO FontRef |]
+{#fun unsafe CGFontCreateWithDataProvider as fontWithDataProvider
+    { withCF* `DataProvider'
+    } -> `Font' getOwned* #}
 
-fontWithDataProvider :: DataProvider -> IO Font
-fontWithDataProvider d = withCF d $ \dp -> 
-            c_CGFontCreateWithDataProvider dp >>= getOwned
+type Glyph = {#type CGGlyph #}
 
-type Glyph = #type CGGlyph
+{#fun pure unsafe CGFontGetUnitsPerEm as unitsPerEm
+    { withCF* `Font'
+    } -> `Int' #}
 
-unsafeForeignImport "CGFontGetGlyphAdvances"
-    [t| FontRef -> Ptr Glyph -> CSize -> Ptr CInt -> IO CBool |]
+{#fun unsafe c_CGFontGetGlyphAdvances
+    { withCF* `Font'
+    , id `Ptr Glyph'
+    , id `CULong'
+    , id `Ptr CInt'
+    } -> `Bool' '(==1)' #}
 
 glyphAdvances :: Font -> [Glyph] -> [CInt]
 glyphAdvances f glyphs = unsafePerformIO $ do
-    withCF f $ \fp -> do
     withArrayLen glyphs $ \len gp -> do
     allocaArray len $ \sp -> do
-    result <- c_CGFontGetGlyphAdvances fp gp (toEnum len) sp
+    result <- c_CGFontGetGlyphAdvances f gp (toEnum len) sp
     -- In my tests, if you pass an invalid character (e.g., too high or negative), 
     -- it just returns zero for each of them.
-    when (result /= 1) $ error "getGlyphAdvances: couldn't get advance"
+    when (not result) $ error "getGlyphAdvances: couldn't get advance"
     peekArray len sp
 
-unsafeForeignImport "CGFontGetUnitsPerEm" [t| FontRef -> IO CInt |]
-
-unitsPerEm :: Font -> CInt
-unitsPerEm f = unsafePerformIO $ withCF f c_CGFontGetUnitsPerEm
-    

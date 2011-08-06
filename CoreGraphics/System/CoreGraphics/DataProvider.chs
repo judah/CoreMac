@@ -11,11 +11,10 @@ import Foreign.C
 import System.CoreFoundation.Base
 import System.CoreFoundation.Internal.TH
 
+#include <ApplicationServices/ApplicationServices.h>
+
 declareCFType "DataProvider"
 
-unsafeForeignImport "CGDataProviderCreateWithFilename"
-    [t| CString -> IO DataProviderRef |]
-
-dataProviderWithFilename :: FilePath -> IO DataProvider
-dataProviderWithFilename path = withCString path $ \cstr -> do
-    c_CGDataProviderCreateWithFilename cstr >>= getOwned
+{#fun unsafe CGDataProviderCreateWithFilename as dataProviderWithFilename
+    { withCString* `FilePath'
+    } -> `DataProvider' getOwned* #}

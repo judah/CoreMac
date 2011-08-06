@@ -29,16 +29,16 @@ import qualified Data.ByteString.Unsafe as UnsafeB
 declareCFType "Data"
 
 
-{#fun CFDataGetBytePtr as getBytePtr
+{#fun unsafe CFDataGetBytePtr as getBytePtr
     { withCF* `Data'
     } -> `Ptr Word8' castPtr #}
 
 -- | Returns the number of bytes stored in the 'Data' object.
-{#fun CFDataGetLength as getLength
+{#fun unsafe CFDataGetLength as getLength
     { withCF* `Data'
     } -> `CFIndex' id #}
 
-{#fun CFDataCreate as createData
+{#fun unsafe CFDataCreate as createData
     { withDefaultAllocator- `AllocatorPtr',
       castPtr `Ptr Word8',
       id `CFIndex'

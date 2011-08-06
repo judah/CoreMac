@@ -9,5 +9,5 @@ import Foreign.C
 
 type AbsoluteTime = {#type CFAbsoluteTime #}
 
-{#fun CFAbsoluteTimeGetCurrent as getCurrentTime
+{#fun unsafe CFAbsoluteTimeGetCurrent as getCurrentTime
     {} -> `AbsoluteTime' id #}
