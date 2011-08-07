@@ -70,7 +70,6 @@ Library
   frameworks: CoreFoundation, Cocoa, Quartz
   -- Ugly hack (to get hsc2hs working) until GHC bug #5106 is fixed.
   cpp-options: -m32
-  cc-options: -march=core2 -U__BLOCKS__ -m32
-  ld-options: -m32
+  cc-options: -march=core2 -U__BLOCKS__ 
   -- Hack: TH needs this at compile time
   ghc-options: -framework CoreFoundation
