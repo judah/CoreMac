@@ -1,0 +1,30 @@
+Name:                NSApplication
+Version:             0.1
+Synopsis:            A simple interface for starting a Cocoa application.
+Description:         This package provides a simple interface for starting a Cocoa
+                      application.
+                     .
+                     See the CoreMac project for more information:
+                     <https://github.com/judah/CoreMac>
+License:             BSD3
+License-file:        LICENSE
+Author:              Judah Jacobson
+Maintainer:          judah.jacobson@gmail.com
+Copyright:           Copyright (c) 2011 Judah Jacobson
+Category:            System
+Build-type:          Simple
+Cabal-version:       >=1.6
+source-repository head
+    type: git
+    location: https://github.com/judah/CoreMac
+
+Library
+  -- Modules exported by the library.
+  Exposed-modules:  
+        System.NSApplication.Main
+
+  Build-depends: base==4.3.*
+  
+  Extensions: ForeignFunctionInterface
+  
+  frameworks: Cocoa
