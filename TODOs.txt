@@ -9,8 +9,6 @@ Lots more of the API
 
 AllocatorRef should be a CFObject?
 
-Rename, since it's not necessarily only for Macs.
-
 More efficient String marshalling
 
 TODOs in Data module
