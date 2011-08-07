@@ -1,43 +1,19 @@
--- The name of the package.
 Name:                CoreFoundation
-
--- The package version. See the Haskell package versioning policy
--- (http://www.haskell.org/haskellwiki/Package_versioning_policy) for
--- standards guiding when and how versions should be incremented.
 Version:             0.1
-
--- A short (one-line) description of the package.
 -- Synopsis:            
-
--- A longer description of the package.
 -- Description:         
-
--- The license under which the package is released.
 License:             BSD3
-
--- The file containing the license text.
 License-file:        LICENSE
-
--- The package author(s).
 Author:              Judah Jacobson
-
--- An email address to which users can send suggestions, bug reports,
--- and patches.
 Maintainer:          judah.jacobson@gmail.com
-
--- A copyright notice.
--- Copyright:           
-
+Copyright:           Copyright (c) 2011 Judah Jacobson
 Category:            System
-
 Build-type:          Simple
 
 -- Extra files to be distributed with the package, such as examples or
 -- a README.
 -- Extra-source-files:  
-
--- Constraint on the version of Cabal needed to build this package.
-Cabal-version:       >=1.2
+Cabal-version:       >=1.6
 
 flag 32bit
     Description: Use the 32-bit API.
@@ -59,9 +35,6 @@ Library
   Build-depends: base==4.3.*, bytestring==0.9.*, text==0.11.*,
                  template-haskell==2.5.*
   
-  -- Modules not exported by this package.
-  -- Other-modules:       
-
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
               RecordWildCards, EmptyDataDecls
   
@@ -73,5 +46,3 @@ Library
   }
   -- Ugly hack (to get hsc2hs working) until GHC bug #5106 is fixed.
   cc-options: -march=core2 -U__BLOCKS__
-  -- Hack: TH needs this at compile time
-  ghc-options: -framework CoreFoundation
