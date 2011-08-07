@@ -1,7 +1,23 @@
 Name:                CoreFoundation
 Version:             0.1
--- Synopsis:            
--- Description:         
+Synopsis:            Bindings to the Core Foundation API for Mac OS X and iOS.
+Description:         This package provides bindings to the Core Foundation API for 
+                     Mac OS X and iOS.  
+                     .
+                     Core Foundation is a C API which provides much of the
+                     functionality of Apple's Objective-C Foundation framework.
+                     This package provides a simpler interface than bindings like HOC
+                     since it does not need to model Objective-C's
+                     object-oriented interface.
+                     . 
+                     Several data types are \"toll-free bridged\" between Foundation and 
+                     Core Foundation, meaning that the corresponding C and Objective-C 
+                     types may be used interchangeably.  
+                     The documentation of a module will note if 
+                     an object is toll-free bridged.  
+                     .
+                     If you are building 64-bit applications, you should install this
+                     package with @cabal install -f-32bit@.
 License:             BSD3
 License-file:        LICENSE
 Author:              Judah Jacobson
@@ -38,7 +54,7 @@ Library
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
               RecordWildCards, EmptyDataDecls
   
-  Build-tools:         c2hs
+  Build-tools: c2hs
 
   frameworks: CoreFoundation
   if flag(32bit) {

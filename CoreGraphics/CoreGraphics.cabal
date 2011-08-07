@@ -1,7 +1,13 @@
 Name:                CoreGraphics
 Version:             0.1
--- Synopsis:            
--- Description:         
+Synopsis:            Bindings to the CoreGraphics API for Mac OS X and iOS.
+Description:         This package provides bindings to the Core Graphics API for
+                     Mac OS X and iOS, also known as "Quartz".
+                     . 
+                     See the CoreFoundation package for more information.
+                     .
+                     If you are building 64-bit applications, you should install this
+                     package with @cabal install -f-32bit@.
 License:             BSD3
 License-file:        LICENSE
 Author:              Judah Jacobson
@@ -36,7 +42,7 @@ Library
   Extensions: ForeignFunctionInterface, TemplateHaskell
               RecordWildCards, EmptyDataDecls
   
-  Build-tools:         c2hs
+  Build-tools: c2hs
 
   frameworks: CoreFoundation, Cocoa, Quartz
   if flag(32bit) {
