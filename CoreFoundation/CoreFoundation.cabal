@@ -25,11 +25,10 @@ Maintainer:          judah.jacobson@gmail.com
 Copyright:           Copyright (c) 2011 Judah Jacobson
 Category:            System
 Build-type:          Simple
-
--- Extra files to be distributed with the package, such as examples or
--- a README.
--- Extra-source-files:  
 Cabal-version:       >=1.6
+source-repository head
+    type: git
+    location: https://github.com/judah/CoreMac
 
 flag 32bit
     Description: Use the 32-bit API.
