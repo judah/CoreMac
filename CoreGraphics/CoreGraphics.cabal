@@ -38,6 +38,9 @@ Build-type:          Simple
 -- Constraint on the version of Cabal needed to build this package.
 Cabal-version:       >=1.2
 
+flag 32bit
+    Description: Use the 32-bit API.
+    Default: True
 
 Library
   -- Modules exported by the library.
@@ -68,8 +71,10 @@ Library
   Build-tools:         c2hs
 
   frameworks: CoreFoundation, Cocoa, Quartz
+  if flag(32bit) {
+    cpp-options: -m32
+  }
   -- Ugly hack (to get hsc2hs working) until GHC bug #5106 is fixed.
-  cpp-options: -m32
   cc-options: -march=core2 -U__BLOCKS__ 
   -- Hack: TH needs this at compile time
   ghc-options: -framework CoreFoundation
