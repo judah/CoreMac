@@ -16,6 +16,9 @@ Copyright:           Copyright (c) 2011 Judah Jacobson
 Category:            System
 Build-type:          Simple
 Cabal-version:       >=1.6
+source-repository head
+    type: git
+    location: https://github.com/judah/CoreMac
 
 flag 32bit
     Description: Use the 32-bit API.
@@ -35,8 +38,8 @@ Library
   include-dirs: includes
   includes: context.h font.h
   
-  Build-depends: base==4.3.*, bytestring==0.9.*, text==0.11.*,
-                 template-haskell==2.5.*,
+  Build-depends: base>=4.3 && < 4.5, bytestring==0.9.*, text==0.11.*,
+                 template-haskell>=2.5 && < 2.7,
                  CoreFoundation==0.1.*
   
   Extensions: ForeignFunctionInterface, TemplateHaskell
