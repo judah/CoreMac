@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'FibTest' target in the 'FibTest' project
+//
+
+#ifdef __OBJC__
+    #import <Cocoa/Cocoa.h>
+#endif
