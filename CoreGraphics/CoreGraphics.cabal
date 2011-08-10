@@ -6,8 +6,8 @@ Description:         This package provides bindings to the Core Graphics API for
                      . 
                      See the CoreFoundation package for more information.
                      .
-                     If you are building 64-bit applications, you should install this
-                     package with @cabal install -f-32bit@.
+                     If you are building 32-bit applications, you should install this
+                     package with @cabal install -f32bit@.
 License:             BSD3
 License-file:        LICENSE
 Author:              Judah Jacobson
@@ -22,7 +22,7 @@ source-repository head
 
 flag 32bit
     Description: Use the 32-bit API.
-    Default: True
+    Default: False
 
 Library
   Exposed-modules:  
