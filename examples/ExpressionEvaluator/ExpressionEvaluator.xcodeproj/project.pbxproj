@@ -14,7 +14,7 @@
 		F7BF666413F361E100DD859B /* ExpressionEvaluatorAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F7BF666313F361E100DD859B /* ExpressionEvaluatorAppDelegate.m */; };
 		F7BF666713F361E200DD859B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7BF666513F361E200DD859B /* MainMenu.xib */; };
 		F7BF667213F365AE00DD859B /* ExpressionController.m in Sources */ = {isa = PBXBuildFile; fileRef = F7BF667113F365AE00DD859B /* ExpressionController.m */; };
-		F7BF667513F366EB00DD859B /* module_init.c in Sources */ = {isa = PBXBuildFile; fileRef = F7BF667413F366EB00DD859B /* module_init.c */; };
+		F7BF667513F366EB00DD859B /* _hs_module_init.c in Sources */ = {isa = PBXBuildFile; fileRef = F7BF667413F366EB00DD859B /* _hs_module_init.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,7 +33,7 @@
 		F7BF666613F361E200DD859B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		F7BF667013F365AE00DD859B /* ExpressionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExpressionController.h; path = ../ExpressionController.h; sourceTree = "<group>"; };
 		F7BF667113F365AE00DD859B /* ExpressionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExpressionController.m; path = ../ExpressionController.m; sourceTree = "<group>"; };
-		F7BF667413F366EB00DD859B /* module_init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = module_init.c; sourceTree = SOURCE_ROOT; };
+		F7BF667413F366EB00DD859B /* _hs_module_init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = _hs_module_init.c; sourceTree = SOURCE_ROOT; };
 		F7BF667613F366FA00DD859B /* ForeignExpr_stub.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ForeignExpr_stub.h; path = haskell/ForeignExpr_stub.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -115,7 +115,7 @@
 			isa = PBXGroup;
 			children = (
 				F7BF667613F366FA00DD859B /* ForeignExpr_stub.h */,
-				F7BF667413F366EB00DD859B /* module_init.c */,
+				F7BF667413F366EB00DD859B /* _hs_module_init.c */,
 			);
 			name = Haskell;
 			sourceTree = "<group>";
@@ -200,7 +200,7 @@
 				F7BF665D13F361E100DD859B /* main.m in Sources */,
 				F7BF666413F361E100DD859B /* ExpressionEvaluatorAppDelegate.m in Sources */,
 				F7BF667213F365AE00DD859B /* ExpressionController.m in Sources */,
-				F7BF667513F366EB00DD859B /* module_init.c in Sources */,
+				F7BF667513F366EB00DD859B /* _hs_module_init.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -324,6 +324,7 @@
 				F7BF666C13F361E200DD859B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
