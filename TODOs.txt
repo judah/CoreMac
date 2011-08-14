@@ -13,4 +13,10 @@ More efficient String marshalling
 
 TODOs in Data module
 
+Think about whether safe foreign imports are better, since unsafe imports can't be preempted:
+http://blog.ezyang.com/2010/07/safety-first-ffi-and-threading/
+It may be OK, though I got this error:
+PROGNAME: schedule: re-entered unsafely.
+   Perhaps a 'foreign import unsafe' should be 'safe'?
+   See the timings in ~/tmp/ffi-threading.
 
