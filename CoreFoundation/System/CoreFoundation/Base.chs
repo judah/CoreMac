@@ -8,7 +8,7 @@ module System.CoreFoundation.Base(
                 -- ** Foreign interaction with 'CFTypeRef's
                 getOwned,
                 getAndRetain,
-                returnAsCopy,
+                retainCFTypeRef,
                 -- *  Allocators
                 AllocatorRef,
                 withDefaultAllocator,
@@ -75,13 +75,30 @@ getAndRetain p
     | otherwise = cfRetain p >>= fmap unsafeCFObject . newForeignPtr cfReleasePtr
 
 
--- | Returns the underlying C object, after calling an extra @CFRetain@ on it.
--- 
--- The consumer of this function must release the returned 'CFTypeRef' using @CFRelease@.  Every call to 'returnAsCopy' must be matched exactly one call to @CFRelease@.
--- 
--- The C object will not be deallocated until some time after the Haskell type goes out of scope and the matching @CFRelease@ has been performed.
-returnAsCopy :: CFObject a => a -> IO CFTypeRef
-returnAsCopy x = withCF x cfRetain
+{- | Returns the underlying C object, after calling an extra @CFRetain@ on it.
+
+The C object will not be deallocated until some point after @CFRelease@ has been
+called on it by foreign code (C or Objective-C).  It will also stay alive while the
+Haskell type is in scope.  Every call to
+'retainCFTypeRef' must be matched by exactly one call to 'CFRelease'.
+
+Objective-C code has a few alternatives to calling 'CFRelease'; however, 
+they depend on the type of memory management used by the foreign code:
+
+  - When using manual memory management, if the 'CFTypeRef' is toll-free bridged to an
+    Objective-C type then you may call @[obj autorelease]@ or @[obj release]@ instead of
+    'CFRelease'.
+
+  - When using garbage collection, you may use either 'CFMakeCollectable' or 'CFRelease'.
+    You should not use @[obj release]@ or @[obj autorelease]@, as those are no-ops when
+    using GC.
+    
+  - When using Automatic Reference Counting, if the 'CFTypeRef' is toll-free bridged 
+    you may use @CFBridgingRelease@ instead of @CFRelease@ to indicate that ARC will be
+    responsible for releasing the object. (Untested.)
+-}
+retainCFTypeRef :: CFObject a => a -> IO CFTypeRef
+retainCFTypeRef x = withCF x cfRetain
 
 ----------
 

@@ -14,7 +14,7 @@ processInput :: StringRef -> IO StringRef
 processInput input = do
     inputS <- getAndRetain input
     outputS <- processInputHelper inputS
-    returnAsCopy outputS
+    retainCFTypeRef outputS
 
 processInputHelper :: CF.String -> IO CF.String
 processInputHelper input = do
