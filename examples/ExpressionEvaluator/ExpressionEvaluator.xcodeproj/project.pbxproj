@@ -127,7 +127,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F7BF666A13F361E200DD859B /* Build configuration list for PBXNativeTarget "ExpressionEvaluator" */;
 			buildPhases = (
-				F7BF667713F3670700DD859B /* ShellScript */,
+				F7BF667713F3670700DD859B /* ghc-xcode */,
 				F7BF664813F361E100DD859B /* Sources */,
 				F7BF664913F361E100DD859B /* Frameworks */,
 				F7BF664A13F361E100DD859B /* Resources */,
@@ -180,18 +180,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		F7BF667713F3670700DD859B /* ShellScript */ = {
+		F7BF667713F3670700DD859B /* ghc-xcode */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "ghc-xcode";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/Users/judah/.cabal/bin/ghc-xcode -ihaskell haskell/ForeignExpr.hs\n";
+			shellScript = "/Users/judah/.cabal/bin/ghc-xcode -ihaskell -threaded haskell/ForeignExpr.hs\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

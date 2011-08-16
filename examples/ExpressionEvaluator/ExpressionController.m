@@ -10,7 +10,19 @@
 
 @implementation ExpressionController
 
+-(void)foo {
+    NSLog(@"About to call foo()");
+    foo();
+    NSLog(@"Called foo(a)");
+    foo();
+    NSLog(@"Called foo(b)");
+    foo();
+    NSLog(@"Called foo().");    
+}
+
 -(IBAction)evaluate:(id)sender {
+    [self performSelectorInBackground:@selector(foo) withObject:nil];
+    
     NSString *input = [inputField stringValue];
     
     // Since (NSString *) and CFStringRef are toll-free bridged, processInput

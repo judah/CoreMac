@@ -41,6 +41,7 @@ Library
         System.CoreFoundation.Base
         System.CoreFoundation.Data
         System.CoreFoundation.String
+        System.CoreFoundation.RunLoop
         System.CoreFoundation.Time
 
         System.CoreFoundation.Internal.TH
@@ -53,6 +54,11 @@ Library
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
               RecordWildCards, EmptyDataDecls
   
+  C-sources: cbits/runloop.c
+  include-dirs: include
+  includes: runloop.h
+
+
   Build-tools: c2hs
 
   frameworks: CoreFoundation

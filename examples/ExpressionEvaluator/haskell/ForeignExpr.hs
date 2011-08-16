@@ -4,6 +4,7 @@ import System.CoreFoundation hiding (String)
 import qualified System.CoreFoundation as CF
 import qualified Data.Text as Text
 import Text.ParserCombinators.Parsec
+import Control.Concurrent
 
 import ExpressionParser
 
@@ -24,3 +25,15 @@ processInputHelper input = do
                     Right result -> show result
     stringFromText $ Text.pack resultStr
         
+foreign export ccall foo :: IO ()
+
+foo = do
+        putStrLn "About to queue..."
+        r <- mainRunLoop
+        putStrLn "Queued."
+        queueIOAndWait r $ do
+                    putStrLn "HereA"
+                    threadDelay 1000000
+                    putStrLn "HereB"
+        putStrLn "HereD"
+
