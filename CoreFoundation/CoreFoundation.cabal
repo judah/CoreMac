@@ -40,8 +40,9 @@ Library
         System.CoreFoundation
         System.CoreFoundation.Base
         System.CoreFoundation.Data
-        System.CoreFoundation.String
+        System.CoreFoundation.Number
         System.CoreFoundation.RunLoop
+        System.CoreFoundation.String
         System.CoreFoundation.Time
 
         System.CoreFoundation.Internal.TH
