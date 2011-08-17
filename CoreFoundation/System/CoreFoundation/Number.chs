@@ -93,13 +93,13 @@ instance IsNumberType (Ptr a) where
     numberTypeOf _ = case sizeOf nullPtr of
                                 4 -> Int32Type
                                 8 -> Int64Type
-                                _ -> error "Unknown pointer size"
+                                _ -> error "Unknown size of Ptr"
 
-instace IsNumberType Int where
+instance IsNumberType Int where
     numberTypeOf _ = case sizeOf (0 :: Int) of
                             4 -> Int32Type
                             8 -> Int64Type
-                            _ -> error 
+                            _ -> error "Unknown size of Int"
 
 {#fun unsafe CFNumberGetValue as getNumberValue
     { withCF* `Number'
