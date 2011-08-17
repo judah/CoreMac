@@ -26,7 +26,6 @@ declareCFType "Array"
 {#fun unsafe CFArrayGetValueAtIndex as getPtrAtIndex
     { withCF* `Array', `Int' } -> `Ptr ()' id #}
 
--- fails if the TypeID doesn't match.
 getObjectAtIndex :: Array -> Int -> IO Object
 getObjectAtIndex a k = getPtrAtIndex a k >>= getAndRetainObject
 
@@ -45,7 +44,4 @@ newArrayFromList objs = withObjects objs $ \ps ->
                     withArrayLen ps $ \ n p ->
                         cfArrayCreate p n kCFTypeArrayCallBacks
                         
-
-                        
-                     
 
