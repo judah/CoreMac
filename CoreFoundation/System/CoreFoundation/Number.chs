@@ -89,6 +89,18 @@ instance IsNumberType CFloat where
 instance IsNumberType CDouble where
     numberTypeOf _ = CDoubleType
 
+instance IsNumberType (Ptr a) where
+    numberTypeOf _ = case sizeOf nullPtr of
+                                4 -> Int32Type
+                                8 -> Int64Type
+                                _ -> error "Unknown pointer size"
+
+instace IsNumberType Int where
+    numberTypeOf _ = case sizeOf (0 :: Int) of
+                            4 -> Int32Type
+                            8 -> Int64Type
+                            _ -> error 
+
 {#fun unsafe CFNumberGetValue as getNumberValue
     { withCF* `Number'
     , cvtEnum `NumberType'
