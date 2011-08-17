@@ -39,6 +39,7 @@ Library
   Exposed-modules:  
         System.CoreFoundation
         System.CoreFoundation.Base
+        System.CoreFoundation.Array
         System.CoreFoundation.Data
         System.CoreFoundation.Number
         System.CoreFoundation.RunLoop
@@ -53,7 +54,7 @@ Library
                  template-haskell>=2.5 && < 2.7
   
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
-              RecordWildCards, EmptyDataDecls
+              RecordWildCards, EmptyDataDecls, ExistentialQuantification
   
   C-sources: cbits/runloop.c
   include-dirs: include

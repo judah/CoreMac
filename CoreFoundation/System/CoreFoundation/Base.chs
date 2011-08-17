@@ -15,6 +15,14 @@ module System.CoreFoundation.Base(
                 staticTypeID,
                 dynamicTypeID,
                 typeIDDescription,
+                -- ** Casting generic objects
+                Object,
+                object,
+                castObject,
+                unsafeCastObject,
+                getAndRetainObject,
+                withObject,
+                withObjects,
                 -- *  Allocators
                 AllocatorRef,
                 withDefaultAllocator,
@@ -177,3 +185,35 @@ typeIDDescription t = unsafePerformIO $ do
 -- | Returns a textual description of the Core Foundation type associated with the Haskell type @a@.
 typeDescription :: CFObject a => a -> String
 typeDescription = typeIDDescription . staticTypeID
+
+newtype Object = Object (ForeignPtr CFType)
+
+object :: CFObject a => a -> Object
+object = Object . unsafeUnCFObject
+
+castObject :: forall a . CFObject a => Object -> Maybe a
+castObject (Object o) = unsafePerformIO $ do
+                            t <- withForeignPtr o dynamicTypeID
+                            return $ if staticTypeID (undefined :: a) == t
+                                then Just $ unsafeCFObject o
+                                else Nothing
+
+-- | Throws an error if the input is not of the given type.
+unsafeCastObject :: forall a . CFObject a => Object -> a
+unsafeCastObject o = case castObject o of
+                        Just x -> x
+                        Nothing -> error $ "unsafeCastObject: expected type "
+                                    ++ show (typeDescription (undefined :: a))
+
+getAndRetainObject :: CFTypeRef -> IO Object
+getAndRetainObject p
+    | p==nullPtr = error "getAndRetainObject: null object"
+    | otherwise = cfRetain p >>= fmap Object . newForeignPtr cfReleasePtr
+
+withObject :: Object -> (CFTypeRef -> IO a) -> IO a
+withObject (Object o) = withForeignPtr o
+
+-- TODO: is this inefficient?
+withObjects :: [Object] -> ([CFTypeRef] -> IO b) -> IO b
+withObjects [] act = act []
+withObjects (o:os) act = withObject o $ \p -> withObjects os $ \ps -> act (p:ps)
