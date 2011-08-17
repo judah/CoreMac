@@ -1,6 +1,9 @@
 module System.CoreFoundation.Internal.Unsafe where
 
 import Foreign
+import Foreign.C
+
+#include <CoreFoundation/CoreFoundation.h>
 
 -- | Dummy type for Core Foundation objects.
 type CFType = ()
@@ -13,4 +16,13 @@ type CFTypeRef = Ptr CFType
 class CFObject a where
     unsafeCFObject :: ForeignPtr CFType -> a
     unsafeUnCFObject :: a -> ForeignPtr CFType
-    typeName :: a -> String
+    getTypeID :: a -> TypeID
+
+newtype TypeID = TypeID {#type CFTypeID #}
+            deriving Eq
+
+-- TypeIDs turn out to be safe for casting, since
+-- mutable and immutable variants use the same functions, but we
+-- only export the immutable API.
+
+

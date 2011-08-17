@@ -3,12 +3,18 @@ module System.CoreFoundation.Base(
                 CFType,
                 CFTypeRef,
                 CFObject(),
+                typeDescription,
                 touchCF,
                 withCF,
                 -- ** Foreign interaction with 'CFTypeRef's
                 getOwned,
                 getAndRetain,
                 retainCFTypeRef,
+                -- * TypeIDs
+                TypeID(),
+                staticTypeID,
+                dynamicTypeID,
+                typeIDDescription,
                 -- *  Allocators
                 AllocatorRef,
                 withDefaultAllocator,
@@ -20,6 +26,7 @@ module System.CoreFoundation.Base(
 
 import Foreign
 import Foreign.C
+import Control.Monad (when)
 
 import System.CoreFoundation.Internal.Unsafe
 
@@ -34,7 +41,6 @@ foreign import ccall "CFRetain" cfRetain :: CFTypeRef -> IO CFTypeRef
 foreign import ccall "&CFRelease" cfReleasePtr :: FunPtr (CFTypeRef -> IO ())
 
 foreign import ccall "CFRelease" cfRelease :: CFTypeRef -> IO ()
-
 
 -- | Like 'touchForeignPtr', ensures that the object will still be alive
 -- at the given place in the sequence of IO events.
@@ -54,10 +60,9 @@ withCF = withForeignPtr . unsafeUnCFObject
 -- At some point after the Haskell type goes out of 
 -- scope, the C object will be automatically released with @CFRelease@.
 getOwned :: forall a . CFObject a => CFTypeRef -> IO a
-getOwned p
-    | p==nullPtr = error $ "getOwned: null object of type "
-                            ++ typeName (undefined :: a)
-    | otherwise = fmap unsafeCFObject $ newForeignPtr cfReleasePtr p
+getOwned p = do
+    checkCFTypeRef "getOwned" p $ staticTypeID (undefined :: a)
+    fmap unsafeCFObject $ newForeignPtr cfReleasePtr p
 
 -- | Returns a Haskell type which references the given Core Foundation C object.
 -- The 'CFTypeRef' must not be null.
@@ -69,11 +74,22 @@ getOwned p
 -- some point after the Haskell type goes out of 
 -- scope, the C object will be automatically released with @CFRelease@.
 getAndRetain :: forall a . CFObject a => CFTypeRef -> IO a
-getAndRetain p
-    | p==nullPtr = error $ "getAndRetain: null object of type "
-                            ++ typeName (undefined :: a)
-    | otherwise = cfRetain p >>= fmap unsafeCFObject . newForeignPtr cfReleasePtr
+getAndRetain p = do
+    checkCFTypeRef "getAndRetain" p $ staticTypeID (undefined :: a)
+    cfRetain p >>= fmap unsafeCFObject . newForeignPtr cfReleasePtr
 
+-- | Checks that the given pointer is non-null and of the right type.
+-- If not, throws an error.
+checkCFTypeRef :: String -> CFTypeRef -> TypeID -> IO ()
+checkCFTypeRef descr p staticID
+    | p==nullPtr = error $ descr ++ ": null object for type "
+                            ++ show (typeIDDescription staticID)
+    | otherwise = do
+                    typeID <- dynamicTypeID p
+                    when (typeID /= staticID)
+                        $ error $ descr ++ ": type mismatch; "
+                            ++ "expected " ++ show (typeIDDescription staticID)
+                            ++ ", got " ++ show (typeIDDescription typeID)
 
 {- | Returns the underlying C object, after calling an extra @CFRetain@ on it.
 
@@ -107,14 +123,57 @@ type AllocatorRef = Ptr ()
 withDefaultAllocator :: (AllocatorRef -> IO a) -> IO a
 withDefaultAllocator f = f nullPtr
 
+
+--------
+
+-- | Returns the 'TypeID' for objects of type @a@.  Does not use the argument.
+staticTypeID :: CFObject a => a -> TypeID
+staticTypeID = getTypeID
+
+-- | Examines the given 'CFTypeRef' to determine its type.
+{#fun CFGetTypeID as dynamicTypeID
+    { id `CFTypeRef' } -> `TypeID' TypeID #}
+
+
+
+
+
+cvtEnum :: (Enum a, Enum b) => a -> b
+cvtEnum = toEnum . fromEnum
+
 -------
 -- Misc types
-
--- | This type corresponds to the C type @Boolean@.
-type CBoolean = {#type Boolean #}
 
 -- | This type corresponds to the C type @CFIndex@.
 type CFIndex = {#type CFIndex #}
 
-cvtEnum :: (Enum a, Enum b) => a -> b
-cvtEnum = toEnum . fromEnum
+-- | This type corresponds to the C type @Boolean@.
+type CBoolean = {#type Boolean #}
+
+------
+-- Getting the String from a TypeID.
+-- The CF.String module provides a better API, but using it would lead to cyclic imports.
+
+foreign import ccall "CFStringGetFileSystemRepresentation"
+        getFileSystemRep :: CFTypeRef -> Ptr CChar -> CFIndex -> IO CBoolean
+
+foreign import ccall "CFStringGetMaximumSizeOfFileSystemRepresentation"
+        getFileSystemRepMaxSize :: CFTypeRef -> IO CFIndex
+
+foreign import ccall "CFCopyTypeIDDescription"
+    copyTypeIDDescription :: TypeID -> IO CFTypeRef
+
+-- | Returns a textual description of the Core Foundation type identified  by the given 'TypeID'.
+-- Does not use its argument.
+typeIDDescription :: TypeID -> String
+typeIDDescription t = unsafePerformIO $ do
+    s <- copyTypeIDDescription t
+    len <- getFileSystemRepMaxSize s
+    allocaArray (fromEnum len) $ \p -> do
+    getFileSystemRep s p len
+    cfRelease s
+    peekCAString p
+
+-- | Returns a textual description of the Core Foundation type associated with the Haskell type @a@.
+typeDescription :: CFObject a => a -> String
+typeDescription = typeIDDescription . staticTypeID
