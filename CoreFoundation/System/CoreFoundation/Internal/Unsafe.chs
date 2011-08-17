@@ -18,7 +18,7 @@ class CFObject a where
     unsafeUnCFObject :: a -> ForeignPtr CFType
     getTypeID :: a -> TypeID
 
-newtype TypeID = TypeID {#type CFTypeID #}
+newtype TypeID = TypeID {unsafeUnTypeID :: {#type CFTypeID #}}
             deriving Eq
 
 -- TypeIDs turn out to be safe for casting, since

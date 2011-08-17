@@ -18,6 +18,8 @@ module System.CoreFoundation.Base(
                 -- ** Casting generic objects
                 Object,
                 object,
+                -- TODO: for generic CFObjects also
+                getObjectDescription,
                 castObject,
                 unsafeCastObject,
                 getAndRetainObject,
@@ -168,19 +170,18 @@ foreign import ccall "CFStringGetFileSystemRepresentation"
 foreign import ccall "CFStringGetMaximumSizeOfFileSystemRepresentation"
         getFileSystemRepMaxSize :: CFTypeRef -> IO CFIndex
 
-foreign import ccall "CFCopyTypeIDDescription"
-    copyTypeIDDescription :: TypeID -> IO CFTypeRef
-
 -- | Returns a textual description of the Core Foundation type identified  by the given 'TypeID'.
--- Does not use its argument.
-typeIDDescription :: TypeID -> String
-typeIDDescription t = unsafePerformIO $ do
-    s <- copyTypeIDDescription t
+{#fun pure CFCopyTypeIDDescription as typeIDDescription
+    { unsafeUnTypeID `TypeID' } -> `String' peekCFStringRef* #}
+
+peekCFStringRef :: CFTypeRef -> IO String
+peekCFStringRef s = do
     len <- getFileSystemRepMaxSize s
     allocaArray (fromEnum len) $ \p -> do
     getFileSystemRep s p len
     cfRelease s
     peekCAString p
+
 
 -- | Returns a textual description of the Core Foundation type associated with the Haskell type @a@.
 typeDescription :: CFObject a => a -> String
@@ -190,6 +191,9 @@ newtype Object = Object (ForeignPtr CFType)
 
 object :: CFObject a => a -> Object
 object = Object . unsafeUnCFObject
+
+{#fun CFCopyDescription as getObjectDescription
+    { withObject* `Object' } -> `String' peekCFStringRef* #}
 
 castObject :: forall a . CFObject a => Object -> Maybe a
 castObject (Object o) = unsafePerformIO $ do
