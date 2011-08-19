@@ -2,29 +2,27 @@ module System.CoreFoundation.Base(
                 -- * Core Foundation Objects
                 CFType,
                 CFTypeRef,
-                CFObject(),
-                typeDescription,
-                touchCF,
-                withCF,
+                Object(),
+                touchObject,
+                withObject,
+                withObjects,
                 -- ** Foreign interaction with 'CFTypeRef's
                 getOwned,
                 getAndRetain,
                 retainCFTypeRef,
                 -- * TypeIDs
                 TypeID(),
+                typeIDDescription,
+                StaticTypeID,
                 staticTypeID,
                 dynamicTypeID,
-                typeIDDescription,
-                -- ** Casting generic objects
-                Object,
-                object,
-                -- TODO: for generic CFObjects also
-                getObjectDescription,
+                staticTypeDescription,
+                dynamicTypeDescription,
+                -- ** Dynamic types
+                DynObj,
+                dyn,
                 castObject,
-                unsafeCastObject,
-                getAndRetainObject,
-                withObject,
-                withObjects,
+                castObjectOrError,
                 -- *  Allocators
                 AllocatorRef,
                 withDefaultAllocator,
@@ -54,12 +52,14 @@ foreign import ccall "CFRelease" cfRelease :: CFTypeRef -> IO ()
 
 -- | Like 'touchForeignPtr', ensures that the object will still be alive
 -- at the given place in the sequence of IO events.
-touchCF :: CFObject a => a -> IO ()
-touchCF = touchForeignPtr . unsafeUnCFObject
+touchObject :: Object a => a -> IO ()
+touchObject = touchForeignPtr . unsafeUnObject
 
--- | Like 'withForeignPtr', extracts the underlying C type.  It is not safe in general to use the 'CFTypeRef' after the action completes.
-withCF :: CFObject a => a -> (CFTypeRef -> IO b) -> IO b
-withCF = withForeignPtr . unsafeUnCFObject
+-- | Like 'withForeignPtr', extracts the underlying C type and keeps the object alive
+-- while the given action is running.
+-- It is not safe in general to use the 'CFTypeRef' after the action completes.
+withObject :: Object a => a -> (CFTypeRef -> IO b) -> IO b
+withObject = withForeignPtr . unsafeUnObject
 
 -- | Returns a Haskell type which references the given Core Foundation C object.
 -- The 'CFTypeRef' must not be null.
@@ -69,10 +69,10 @@ withCF = withForeignPtr . unsafeUnCFObject
 -- 
 -- At some point after the Haskell type goes out of 
 -- scope, the C object will be automatically released with @CFRelease@.
-getOwned :: forall a . CFObject a => CFTypeRef -> IO a
+getOwned :: forall a . Object a => CFTypeRef -> IO a
 getOwned p = do
-    checkCFTypeRef "getOwned" p $ staticTypeID (undefined :: a)
-    fmap unsafeCFObject $ newForeignPtr cfReleasePtr p
+    checkCFTypeRef "getOwned" p $ maybeStaticTypeID (undefined :: a)
+    fmap unsafeObject $ newForeignPtr cfReleasePtr p
 
 -- | Returns a Haskell type which references the given Core Foundation C object.
 -- The 'CFTypeRef' must not be null.
@@ -83,23 +83,24 @@ getOwned p = do
 -- This function calls @CFRetain@ on its argument.  At
 -- some point after the Haskell type goes out of 
 -- scope, the C object will be automatically released with @CFRelease@.
-getAndRetain :: forall a . CFObject a => CFTypeRef -> IO a
+getAndRetain :: forall a . Object a => CFTypeRef -> IO a
 getAndRetain p = do
-    checkCFTypeRef "getAndRetain" p $ staticTypeID (undefined :: a)
-    cfRetain p >>= fmap unsafeCFObject . newForeignPtr cfReleasePtr
+    checkCFTypeRef "getAndRetain" p $ maybeStaticTypeID (undefined :: a)
+    cfRetain p >>= fmap unsafeObject . newForeignPtr cfReleasePtr
 
 -- | Checks that the given pointer is non-null and of the right type.
 -- If not, throws an error.
-checkCFTypeRef :: String -> CFTypeRef -> TypeID -> IO ()
-checkCFTypeRef descr p staticID
-    | p==nullPtr = error $ descr ++ ": null object for type "
-                            ++ show (typeIDDescription staticID)
-    | otherwise = do
-                    typeID <- dynamicTypeID p
-                    when (typeID /= staticID)
-                        $ error $ descr ++ ": type mismatch; "
-                            ++ "expected " ++ show (typeIDDescription staticID)
-                            ++ ", got " ++ show (typeIDDescription typeID)
+checkCFTypeRef :: String -> CFTypeRef -> Maybe TypeID -> IO ()
+checkCFTypeRef descr p maybeStaticID
+    | p==nullPtr = error $ descr ++ ": null object"
+    | otherwise = case maybeStaticID of
+                    Nothing -> return ()
+                    Just staticID -> do
+                        dynTypeID <- cfTypeID p
+                        when (dynTypeID /= staticID)
+                            $ error $ descr ++ ": type mismatch; "
+                                ++ "expected " ++ show (typeIDDescription staticID)
+                                ++ ", got " ++ show (typeIDDescription dynTypeID)
 
 {- | Returns the underlying C object, after calling an extra @CFRetain@ on it.
 
@@ -123,8 +124,8 @@ they depend on the type of memory management used by the foreign code:
     you may use @CFBridgingRelease@ instead of @CFRelease@ to indicate that ARC will be
     responsible for releasing the object. (Untested.)
 -}
-retainCFTypeRef :: CFObject a => a -> IO CFTypeRef
-retainCFTypeRef x = withCF x cfRetain
+retainCFTypeRef :: Object a => a -> IO CFTypeRef
+retainCFTypeRef x = withObject x cfRetain
 
 ----------
 
@@ -136,15 +137,18 @@ withDefaultAllocator f = f nullPtr
 
 --------
 
--- | Returns the 'TypeID' for objects of type @a@.  Does not use the argument.
-staticTypeID :: CFObject a => a -> TypeID
-staticTypeID = getTypeID
-
 -- | Examines the given 'CFTypeRef' to determine its type.
-{#fun CFGetTypeID as dynamicTypeID
+{#fun pure CFGetTypeID as dynamicTypeID
+    `Object a' => { withObject* `a' } -> `TypeID' TypeID #}
+
+-- | Returns the 'TypeID' associated with objects of type @a@.  
+-- Does not use its argument.
+staticTypeID :: StaticTypeID a => a -> TypeID
+staticTypeID = unsafeStaticTypeID
+
+-- Helper
+{#fun CFGetTypeID as cfTypeID
     { id `CFTypeRef' } -> `TypeID' TypeID #}
-
-
 
 
 
@@ -184,40 +188,41 @@ peekCFStringRef s = do
 
 
 -- | Returns a textual description of the Core Foundation type associated with the Haskell type @a@.
-typeDescription :: CFObject a => a -> String
-typeDescription = typeIDDescription . staticTypeID
+staticTypeDescription :: StaticTypeID a => a -> String
+staticTypeDescription = typeIDDescription . staticTypeID
 
-newtype Object = Object (ForeignPtr CFType)
+-- | Returns a textual description of the type of the given Core Foundation object.
+dynamicTypeDescription :: Object a => a -> String
+dynamicTypeDescription = typeIDDescription . dynamicTypeID
 
-object :: CFObject a => a -> Object
-object = Object . unsafeUnCFObject
+-- | A 'DynObj' wraps a Core Foundation object of unknown type.
+newtype DynObj = DynObj (ForeignPtr CFType)
+
+instance Object DynObj where
+    unsafeObject = DynObj
+    unsafeUnObject (DynObj o) = o
+    maybeStaticTypeID _ = Nothing
+
+dyn :: Object a => a -> DynObj
+dyn = DynObj . unsafeUnObject
+
+castObject  :: forall a . Object a => DynObj -> Maybe a
+castObject o@(DynObj p) = case maybeStaticTypeID (undefined :: a) of
+                    Just t | t /= dynamicTypeID o   -> Nothing
+                    _                               -> Just $ unsafeObject p
 
 {#fun CFCopyDescription as getObjectDescription
-    { withObject* `Object' } -> `String' peekCFStringRef* #}
-
-castObject :: forall a . CFObject a => Object -> Maybe a
-castObject (Object o) = unsafePerformIO $ do
-                            t <- withForeignPtr o dynamicTypeID
-                            return $ if staticTypeID (undefined :: a) == t
-                                then Just $ unsafeCFObject o
-                                else Nothing
+    `Object a' => { withObject* `a' } -> `String' peekCFStringRef* #}
 
 -- | Throws an error if the input is not of the given type.
-unsafeCastObject :: forall a . CFObject a => Object -> a
-unsafeCastObject o = case castObject o of
-                        Just x -> x
-                        Nothing -> error $ "unsafeCastObject: expected type "
-                                    ++ show (typeDescription (undefined :: a))
-
-getAndRetainObject :: CFTypeRef -> IO Object
-getAndRetainObject p
-    | p==nullPtr = error "getAndRetainObject: null object"
-    | otherwise = cfRetain p >>= fmap Object . newForeignPtr cfReleasePtr
-
-withObject :: Object -> (CFTypeRef -> IO a) -> IO a
-withObject (Object o) = withForeignPtr o
+castObjectOrError :: forall a . Object a => DynObj -> a
+castObjectOrError o@(DynObj p)
+    = case maybeStaticTypeID (undefined :: a) of
+        Just t | t /= dynamicTypeID o   -> error $ "unsafeCastObject: expected type "
+                                            ++ show (typeIDDescription t)
+        _ -> unsafeObject p
 
 -- TODO: is this inefficient?
-withObjects :: [Object] -> ([CFTypeRef] -> IO b) -> IO b
+withObjects :: Object a => [a] -> ([CFTypeRef] -> IO b) -> IO b
 withObjects [] act = act []
 withObjects (o:os) act = withObject o $ \p -> withObjects os $ \ps -> act (p:ps)

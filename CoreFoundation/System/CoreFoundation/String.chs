@@ -68,14 +68,14 @@ declareCFType "String"
 
 {#fun unsafe CFStringCreateExternalRepresentation as createExternalRepresentation
     { withDefaultAllocator- `AllocatorPtr',
-      withCF* `String',
+      withObject* `String',
       cvtEnum `StringEncoding',
       cvtEnum `Word8'
     } -> `Data' getOwned* #}
 
 {#fun unsafe CFStringCreateFromExternalRepresentation as createFromExternalRepresentation
     { withDefaultAllocator- `AllocatorPtr',
-      withCF* `Data',
+      withObject* `Data',
       cvtEnum `StringEncoding'
     } -> `String' getOwned* #}
 

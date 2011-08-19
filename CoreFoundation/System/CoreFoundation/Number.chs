@@ -27,7 +27,7 @@ declareCFType "Number"
 -- | Returns whether the 'Number' contains a value stored internally
 -- as one of the floating point types.
 {#fun CFNumberIsFloatType as isFloatType
-    { withCF* `Number' } -> `Bool' '(>0)' #}
+    { withObject* `Number' } -> `Bool' '(>0)' #}
     
 {#enum define NumberType
     { kCFNumberSInt8Type as Int8Type
@@ -54,7 +54,7 @@ declareCFType "Number"
 -- a new 'Number' is created --- it uses whatever internal storage type
 -- it deems appropriate.
 {#fun pure unsafe CFNumberGetType as numberType
-    { withCF* `Number' } -> `NumberType' cvtEnum #}
+    { withObject* `Number' } -> `NumberType' cvtEnum #}
 
 class Storable a => IsNumberType a where
     numberTypeOf :: a -> NumberType
@@ -102,7 +102,7 @@ instance IsNumberType Int where
                             _ -> error "Unknown size of Int"
 
 {#fun unsafe CFNumberGetValue as getNumberValue
-    { withCF* `Number'
+    { withObject* `Number'
     , cvtEnum `NumberType'
     , castPtr `Ptr a'
     } -> `CBoolean' id #}

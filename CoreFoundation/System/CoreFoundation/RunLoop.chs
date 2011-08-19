@@ -35,12 +35,12 @@ foreign import ccall "CFRunLoopGetCurrent" cfRunLoopGetCurrent :: IO (Ptr ())
 foreign import ccall "CFRunLoopGetMain" cfRunLoopGetMain :: IO (Ptr ())
 
 {#fun queueFunctionForRunLoop
-    { withCF* `RunLoop'
+    { withObject* `RunLoop'
     , id `Ptr ()'
     } -> `()' #}
 
 {#fun CFRunLoopWakeUp as wakeUpRunLoop
-    { withCF* `RunLoop' } -> `()' #}
+    { withObject* `RunLoop' } -> `()' #}
 
 foreign export ccall runHSAction :: StablePtr (IO ()) -> IO ()
 

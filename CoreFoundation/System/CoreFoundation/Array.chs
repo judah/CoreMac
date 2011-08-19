@@ -6,11 +6,11 @@ module System.CoreFoundation.Array(
                     getCount,
                     getObjectAtIndex,
                     -- * Creating arrays
-                    newArrayFromList,
+                    newArray,
                     ) where
 
 
-import Foreign
+import Foreign hiding (newArray)
 import Foreign.C
 import System.CoreFoundation.Base
 import System.CoreFoundation.Internal.TH
@@ -21,13 +21,16 @@ declareCFType "Array"
 
 -- | Returns the number of values currently stored in an array.
 {#fun unsafe CFArrayGetCount as getCount
-    { withCF* `Array' } -> `Int' #}
+    { withObject* `Array' } -> `Int' #}
 
 {#fun unsafe CFArrayGetValueAtIndex as getPtrAtIndex
-    { withCF* `Array', `Int' } -> `Ptr ()' id #}
+    { withObject* `Array', `Int' } -> `Ptr ()' id #}
 
-getObjectAtIndex :: Array -> Int -> IO Object
-getObjectAtIndex a k = getPtrAtIndex a k >>= getAndRetainObject
+-- TODO: out-of-bounds errors will cause this to crash!
+-- Also, note that this fails if the object isn't of the right type.
+
+getObjectAtIndex :: Object a => Array -> Int -> IO a
+getObjectAtIndex a k = getPtrAtIndex a k >>= getAndRetain
 
 -- For when all the elements are CFType-derived.
 foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
@@ -39,8 +42,8 @@ foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
     , id `Ptr ()'
     } -> `Array' getOwned* #}
 
-newArrayFromList :: [Object] -> IO Array
-newArrayFromList objs = withObjects objs $ \ps ->
+newArray :: Object a => [a] -> IO Array
+newArray objs = withObjects objs $ \ps ->
                     withArrayLen ps $ \ n p ->
                         cfArrayCreate p n kCFTypeArrayCallBacks
                         

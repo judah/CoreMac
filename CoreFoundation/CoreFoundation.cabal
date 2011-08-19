@@ -48,6 +48,8 @@ Library
         System.CoreFoundation.Time
 
         System.CoreFoundation.Internal.TH
+
+  Other-modules:  
         System.CoreFoundation.Internal.Unsafe
 
   -- Packages needed in order to build this package.

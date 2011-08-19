@@ -21,17 +21,17 @@ import System.CoreGraphics.DataProvider
 declareCFType "Font"
 
 {#fun unsafe CGFontCreateWithDataProvider as fontWithDataProvider
-    { withCF* `DataProvider'
+    { withObject* `DataProvider'
     } -> `Font' getOwned* #}
 
 type Glyph = {#type CGGlyph #}
 
 {#fun pure unsafe CGFontGetUnitsPerEm as unitsPerEm
-    { withCF* `Font'
+    { withObject* `Font'
     } -> `Int' #}
 
 {#fun unsafe c_CGFontGetGlyphAdvances
-    { withCF* `Font'
+    { withObject* `Font'
     , id `Ptr Glyph'
     , id `CULong'
     , id `Ptr CInt'

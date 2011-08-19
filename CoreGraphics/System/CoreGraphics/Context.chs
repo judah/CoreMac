@@ -29,12 +29,12 @@ withArrayLen_ :: (Storable a, Enum b) => [a] -> ((Ptr a,b) -> IO c) -> IO c
 withArrayLen_ gs f = withArrayLen gs (\n p -> f (castPtr p,toEnum n))
 
 {#fun unsafe c_CGContextFillRect as fillRect
-    { withCF* `Context',
+    { withObject* `Context',
       'with_'* `Rect'
     } -> `()' #}
 
 {#fun unsafe CGContextShowGlyphsAtPoint as showGlyphsAtPoint'
-    { withCF* `Context',
+    { withObject* `Context',
       id `CGFloat', id `CGFloat',
       'withArrayLen_'* `[Glyph]'&
     } -> `()' #}
@@ -43,17 +43,17 @@ showGlyphsAtPoint :: Context -> Point -> [Glyph] -> IO ()
 showGlyphsAtPoint c pt gs = showGlyphsAtPoint' c (pointX pt) (pointY pt) gs
 
 {#fun unsafe CGContextSetFont as setFont
-    { withCF* `Context',
-      withCF* `Font'
+    { withObject* `Context',
+      withObject* `Font'
     } -> `()' #}
 
 {#fun unsafe CGContextSetFontSize as setFontSize
-    { withCF* `Context',
+    { withObject* `Context',
       id `CGFloat'
     } -> `()' #}
 
 {#fun c_CGContextSetTextMatrix as setTextMatrix
-    { withCF* `Context'
+    { withObject* `Context'
     , 'with_'* `AffineTransform'
     } -> `()' #}
       

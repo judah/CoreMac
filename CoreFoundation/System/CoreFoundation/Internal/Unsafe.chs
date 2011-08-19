@@ -5,7 +5,6 @@ import Foreign.C
 
 #include <CoreFoundation/CoreFoundation.h>
 
--- | Dummy type for Core Foundation objects.
 type CFType = ()
 
 -- | A reference (i.e., pointer) to a Core Foundation object.  For example,
@@ -13,13 +12,16 @@ type CFType = ()
 type CFTypeRef = Ptr CFType
 
 -- | A type class for Haskell types which wrap Core Foundation objects.
-class CFObject a where
-    unsafeCFObject :: ForeignPtr CFType -> a
-    unsafeUnCFObject :: a -> ForeignPtr CFType
-    getTypeID :: a -> TypeID
+class Object a where
+    unsafeObject :: ForeignPtr CFType -> a
+    unsafeUnObject :: a -> ForeignPtr CFType
+    maybeStaticTypeID :: a -> Maybe TypeID -- Nothing if it's a dynamic type
 
 newtype TypeID = TypeID {unsafeUnTypeID :: {#type CFTypeID #}}
             deriving Eq
+
+class Object a => StaticTypeID a where
+    unsafeStaticTypeID :: a -> TypeID
 
 -- TypeIDs turn out to be safe for casting, since
 -- mutable and immutable variants use the same functions, but we

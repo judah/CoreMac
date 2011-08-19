@@ -20,26 +20,26 @@ declareCFType "Dictionary"
 #include <CoreFoundation/CoreFoundation.h>
 
 {#fun unsafe CFDictionaryGetCount as getValueCount
-    { withCF* `Dictionary' } -> `Int' #}
+    { withObject* `Dictionary' } -> `Int' #}
 
 -- TODO: allow any old type as key?
 
 {#fun unsafe CFDictionaryGetValue as getValue
-    { withCF* `Dictionary' 
-    , withObject* `Object'
-    } -> `Maybe Object' maybeGetObject* #}
+    `(Object key, Object value)' => { withObject* `Dictionary' 
+    , withObject* `key'
+    } -> `Maybe value' maybeGetAndRetain* #}
 
 -- There's subtlety around GetValueForKey returning NULL; see the docs.
 -- For now, we'll assume it acts like NSDocument and doesn't have nil values.
 
-maybeGetObject :: CFTypeRef -> IO (Maybe Object)
-maybeGetObject p
+maybeGetAndRetain :: Object a => CFTypeRef -> IO (Maybe a)
+maybeGetAndRetain p
     | p==nullPtr = return Nothing
-    | otherwise = fmap Just $ getAndRetainObject p
+    | otherwise = fmap Just $ getAndRetain p
 
 -- | Returns Nothing if the key was not found in the 'Dictionary', or if the corresponding
 -- value is of an incompatible type.
-getValueOfType :: CFObject a => Dictionary -> Object -> IO (Maybe a)
+getValueOfType :: (Object key, Object value) => Dictionary -> key -> IO (Maybe value)
 getValueOfType d k = do
                 mObject <- getValue d k
                 return $ mObject >>= castObject
@@ -57,7 +57,7 @@ foreign import ccall "&" kCFTypeDictionaryValueCallBacks :: Ptr ()
     , id `Ptr ()'
     } -> `Dictionary' getOwned* #}
 
-newDictionary :: [(Object,Object)] -- ^ A list of @(key,value)@ pairs
+newDictionary :: (Object key, Object value) => [(key,value)]
                     -> IO Dictionary
 newDictionary kvs = do
     let (keys,values) = unzip kvs
