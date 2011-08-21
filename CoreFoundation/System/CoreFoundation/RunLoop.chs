@@ -1,8 +1,8 @@
 -- | Core Foundation run loops.  
 module System.CoreFoundation.RunLoop(
                     RunLoop,
-                    currentRunLoop,
-                    mainRunLoop,
+                    getCurrentRunLoop,
+                    getMainRunLoop,
                     queueIO,
                     queueIOAndWait,
                     ) where
@@ -24,11 +24,11 @@ declareCFType "RunLoop"
 
 -- | Returns the 'RunLoop' for the current OS thread.  Every OS (i.e., POSIX)
 -- thread has exactly one run loop associated with it.
-{#fun CFRunLoopGetCurrent as currentRunLoop 
+{#fun CFRunLoopGetCurrent as getCurrentRunLoop 
     { } -> `RunLoop' getAndRetain* #}
 
 -- | Returns the 'RunLoop' for the program's main thread.
-{#fun CFRunLoopGetMain as mainRunLoop
+{#fun CFRunLoopGetMain as getMainRunLoop
     { } -> `RunLoop' getAndRetain* #}
 
 foreign import ccall "CFRunLoopGetCurrent" cfRunLoopGetCurrent :: IO (Ptr ())
