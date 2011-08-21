@@ -2,6 +2,7 @@ module System.CoreFoundation(
             module System.CoreFoundation.Base,
             module System.CoreFoundation.Array,
             module System.CoreFoundation.Data,
+            module System.CoreFoundation.Error,
             module System.CoreFoundation.Dictionary,
             module System.CoreFoundation.Number,
             module System.CoreFoundation.RunLoop,
@@ -12,6 +13,7 @@ module System.CoreFoundation(
 import System.CoreFoundation.Base
 import System.CoreFoundation.Array
 import System.CoreFoundation.Data
+import System.CoreFoundation.Error
 import System.CoreFoundation.Dictionary
 import System.CoreFoundation.Number
 import System.CoreFoundation.RunLoop

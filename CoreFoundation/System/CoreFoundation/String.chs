@@ -12,6 +12,9 @@ module System.CoreFoundation.String(
                 -- * Conversion to/from 'Text'
                 newStringFromText,
                 getText,
+                -- * Foreign import of string constants
+                importCFString,
+                importCFStringAs,
                 ) where
 
 -- TODO: 
@@ -38,6 +41,7 @@ import qualified Prelude
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Encoding
 import Data.Text.Foreign (useAsPtr, fromPtr)
+import Language.Haskell.TH
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -102,3 +106,20 @@ getText s = do
 -- | Extract a 'Prelude.String' copy of the given @CoreFoundation.String@.
 getChars :: String -> IO Prelude.String
 getChars = fmap Text.unpack . getText
+
+
+importCFStringAs :: Prelude.String -> Prelude.String -> Q [Dec]
+importCFStringAs foreignStr nameStr = do
+    ptrName <- newName (nameStr ++ "Ptr")
+    let name = mkName nameStr
+    ptrType <- [t| Ptr CFTypeRef |]
+    expr <- [| unsafePerformIO $ peek $(varE ptrName) >>= getAndRetain |]
+    return
+        [ ForeignD $ ImportF CCall Safe ("&" ++ foreignStr) ptrName ptrType
+        , SigD name (ConT ''String)
+        , FunD name [Clause [] (NormalB expr) []]
+        ]
+
+
+importCFString :: Prelude.String -> Q [Dec]
+importCFString s = importCFStringAs s s

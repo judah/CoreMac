@@ -41,6 +41,7 @@ Library
         System.CoreFoundation.Base
         System.CoreFoundation.Array
         System.CoreFoundation.Data
+        System.CoreFoundation.Error
         System.CoreFoundation.Dictionary
         System.CoreFoundation.Number
         System.CoreFoundation.RunLoop
