@@ -1,7 +1,7 @@
 module System.CoreGraphics.Font(
                     Font,
                     FontRef,
-                    fontWithDataProvider,
+                    newFontWithDataProvider,
                     Glyph,
                     glyphAdvances,
                     unitsPerEm,
@@ -20,7 +20,7 @@ import System.CoreGraphics.DataProvider
 
 declareCFType "Font"
 
-{#fun unsafe CGFontCreateWithDataProvider as fontWithDataProvider
+{#fun unsafe CGFontCreateWithDataProvider as newFontWithDataProvider
     { withObject* `DataProvider'
     } -> `Font' getOwned* #}
 

@@ -4,8 +4,8 @@ module System.CoreFoundation.Data(
                 DataRef,
                 getLength,
                 withData,
-                dataToByteString,
-                dataFromByteString,
+                newData,
+                getByteString,
                 ) where
 
 -- TODO:
@@ -55,10 +55,10 @@ withData d f = do
     f p len `finally` touchObject d
 
 -- | Makes a new copy of the given data.
-dataToByteString :: Data -> IO B.ByteString
-dataToByteString d = withData d $ \p n -> B.packCStringLen (castPtr p, cvtEnum n)
+getByteString :: Data -> IO B.ByteString
+getByteString d = withData d $ \p n -> B.packCStringLen (castPtr p, cvtEnum n)
 
 -- | Makes a new Data object with a copy of the ByteString's data.
-dataFromByteString :: B.ByteString -> IO Data
-dataFromByteString b = UnsafeB.unsafeUseAsCStringLen b $ \(p,len) ->
+newData :: B.ByteString -> IO Data
+newData b = UnsafeB.unsafeUseAsCStringLen b $ \(p,len) ->
                         createData (castPtr p) (toEnum len)

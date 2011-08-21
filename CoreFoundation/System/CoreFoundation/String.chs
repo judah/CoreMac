@@ -2,15 +2,16 @@
 module System.CoreFoundation.String(
                 String,
                 StringRef,
-                -- * Creating Strings
-                createStringWithBytes,
-                StringEncoding(..),
                 -- * Conversion to/from 'Data'
-                createExternalRepresentation,
-                createFromExternalRepresentation,
+                newExternalRepresentation,
+                newStringFromExternalRepresentation,
+                StringEncoding(..),
+                -- * Conversion to/from 'Prelude.String'
+                newStringFromChars,
+                getChars,
                 -- * Conversion to/from 'Text'
-                stringFromText,
-                stringToText,
+                newStringFromText,
+                getText,
                 ) where
 
 -- TODO: 
@@ -32,7 +33,7 @@ import System.CoreFoundation.Internal.TH
 import System.CoreFoundation.Data
 
 import Prelude hiding (String)
-import qualified Prelude as P
+import qualified Prelude
 
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Encoding
@@ -66,29 +67,38 @@ declareCFType "String"
       `Bool'
     } -> `String' getOwned* #}
 
-{#fun unsafe CFStringCreateExternalRepresentation as createExternalRepresentation
+{#fun unsafe CFStringCreateExternalRepresentation as newExternalRepresentation
     { withDefaultAllocator- `AllocatorPtr',
       withObject* `String',
       cvtEnum `StringEncoding',
       cvtEnum `Word8'
     } -> `Data' getOwned* #}
 
-{#fun unsafe CFStringCreateFromExternalRepresentation as createFromExternalRepresentation
+{#fun unsafe CFStringCreateFromExternalRepresentation as newStringFromExternalRepresentation
     { withDefaultAllocator- `AllocatorPtr',
       withObject* `Data',
       cvtEnum `StringEncoding'
     } -> `String' getOwned* #}
 
--- TODO: endianness?
--- | Create a copy of the Text in a CF.String.
-stringFromText :: Text.Text -> IO String
-stringFromText t = useAsPtr t $ \p len ->
+
+
+-- | Create a new @CoreFoundation.String@ which contains a copy of the given 'Text'.
+newStringFromText :: Text.Text -> IO String
+newStringFromText t = useAsPtr t $ \p len ->
                         createStringWithBytes (castPtr p)
                             (cvtEnum $ 2*len) UTF16
                             False -- Text doesn't add a BOM
 
--- | Copies the String into Text.
-stringToText :: String -> IO Text.Text
-stringToText s = do
-    d <- createExternalRepresentation s UTF16LE (cvtEnum '?')
-    fmap Encoding.decodeUtf16LE $ dataToByteString d
+-- | Create a new @CoreFoundation.String@ which contains a copy of the given @Prelude.String@.
+newStringFromChars :: Prelude.String -> IO String
+newStringFromChars = newStringFromText . Text.pack
+
+-- | Extract a 'Text' copy of the given @CoreFoundation.String@.
+getText :: String -> IO Text.Text
+getText s = do
+    d <- newExternalRepresentation s UTF16LE (cvtEnum '?')
+    fmap Encoding.decodeUtf16LE $ getByteString d
+
+-- | Extract a 'Prelude.String' copy of the given @CoreFoundation.String@.
+getChars :: String -> IO Prelude.String
+getChars = fmap Text.unpack . getText

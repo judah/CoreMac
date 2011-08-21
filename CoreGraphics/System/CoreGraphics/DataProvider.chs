@@ -2,7 +2,7 @@
 module System.CoreGraphics.DataProvider(
                     DataProvider,
                     DataProviderRef,
-                    dataProviderWithFilename,
+                    newDataProviderFromFile,
                     ) where
 
 import Foreign
@@ -15,6 +15,6 @@ import System.CoreFoundation.Internal.TH
 
 declareCFType "DataProvider"
 
-{#fun unsafe CGDataProviderCreateWithFilename as dataProviderWithFilename
+{#fun unsafe CGDataProviderCreateWithFilename as newDataProviderFromFile
     { withCString* `FilePath'
     } -> `DataProvider' getOwned* #}
