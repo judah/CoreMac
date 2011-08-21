@@ -9,6 +9,7 @@ module System.CoreFoundation.Base(
                 -- ** Foreign interaction with 'CFTypeRef's
                 getOwned,
                 getAndRetain,
+                maybeGetAndRetain,
                 retainCFTypeRef,
                 -- * TypeIDs
                 TypeID(),
@@ -87,6 +88,14 @@ getAndRetain :: forall a . Object a => CFTypeRef -> IO a
 getAndRetain p = do
     checkCFTypeRef "getAndRetain" p $ maybeStaticTypeID (undefined :: a)
     cfRetain p >>= fmap unsafeObject . newForeignPtr cfReleasePtr
+
+-- | Retuns a Haskell type which references the given Core Foundation C object.
+-- This function performs the same as 'getAndRetain', except that it returns 'Nothing'
+-- if the input is NULL.
+maybeGetAndRetain :: Object a => CFTypeRef -> IO (Maybe a)
+maybeGetAndRetain p
+    | p==nullPtr = return Nothing
+    | otherwise = fmap Just $ getAndRetain p
 
 -- | Checks that the given pointer is non-null and of the right type.
 -- If not, throws an error.

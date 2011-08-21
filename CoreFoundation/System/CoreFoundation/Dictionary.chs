@@ -32,11 +32,6 @@ declareCFType "Dictionary"
 -- There's subtlety around GetValueForKey returning NULL; see the docs.
 -- For now, we'll assume it acts like NSDocument and doesn't have nil values.
 
-maybeGetAndRetain :: Object a => CFTypeRef -> IO (Maybe a)
-maybeGetAndRetain p
-    | p==nullPtr = return Nothing
-    | otherwise = fmap Just $ getAndRetain p
-
 -- | Returns Nothing if the key was not found in the 'Dictionary', or if the corresponding
 -- value is of an incompatible type.
 getValueOfType :: (Object key, Object value) => Dictionary -> key -> IO (Maybe value)
