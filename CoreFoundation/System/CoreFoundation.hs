@@ -5,6 +5,7 @@ module System.CoreFoundation(
             module System.CoreFoundation.Error,
             module System.CoreFoundation.Dictionary,
             module System.CoreFoundation.Number,
+            module System.CoreFoundation.Preferences,
             module System.CoreFoundation.RunLoop,
             module System.CoreFoundation.String,
             module System.CoreFoundation.Time,
@@ -16,6 +17,7 @@ import System.CoreFoundation.Data
 import System.CoreFoundation.Error
 import System.CoreFoundation.Dictionary
 import System.CoreFoundation.Number
+import System.CoreFoundation.Preferences
 import System.CoreFoundation.RunLoop
 import System.CoreFoundation.String
 import System.CoreFoundation.Time

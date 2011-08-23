@@ -44,6 +44,7 @@ Library
         System.CoreFoundation.Error
         System.CoreFoundation.Dictionary
         System.CoreFoundation.Number
+        System.CoreFoundation.Preferences
         System.CoreFoundation.RunLoop
         System.CoreFoundation.String
         System.CoreFoundation.Time
