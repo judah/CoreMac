@@ -59,7 +59,8 @@ Library
                  template-haskell>=2.5 && < 2.7
   
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
-              RecordWildCards, EmptyDataDecls, ExistentialQuantification
+              RecordWildCards, EmptyDataDecls, ExistentialQuantification,
+              TypeSynonymInstances, FlexibleInstances
   
   C-sources: cbits/runloop.c
   include-dirs: include
