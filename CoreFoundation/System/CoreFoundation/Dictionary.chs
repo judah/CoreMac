@@ -7,7 +7,7 @@ module System.CoreFoundation.Dictionary(
                     getValue,
                     getValueOfType,
                     -- * Creating dictionaries
-                    newDictionary,
+                    fromKeyValues,
                     ) where
 
 import Foreign
@@ -52,9 +52,10 @@ foreign import ccall "&" kCFTypeDictionaryValueCallBacks :: Ptr ()
     , id `Ptr ()'
     } -> `Dictionary' getOwned* #}
 
-newDictionary :: (Object key, Object value) => [(key,value)]
-                    -> IO Dictionary
-newDictionary kvs = do
+-- | Create a new immutable 'Dictionary' whose keys and values are taken from the given
+-- list.
+fromKeyValues :: (Object key, Object value) => [(key,value)] -> Dictionary
+fromKeyValues kvs = unsafePerformIO $ do
     let (keys,values) = unzip kvs
     withObjects keys $ \ks -> do
     withArrayLen ks $ \n pks -> do

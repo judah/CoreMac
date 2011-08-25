@@ -3,9 +3,8 @@
 module System.CoreFoundation.Number(
                 Number,
                 NumberRef,
-                newNumber,
-                unsafeNumber,
-                numberValue,
+                number,
+                value,
                 numberType,
                 IsNumberType,
                 NumberType(..),
@@ -27,7 +26,7 @@ declareCFType "Number"
 
 -- | Returns whether the 'Number' contains a value stored internally
 -- as one of the floating point types.
-{#fun CFNumberIsFloatType as isFloatType
+{#fun pure CFNumberIsFloatType as isFloatType
     { withObject* `Number' } -> `Bool' '(>0)' #}
     
 {#enum define NumberType
@@ -51,7 +50,7 @@ declareCFType "Number"
 
 -- Returns the type used by the 'Number' object to store its value. 
 -- 
--- The type specified by 'newNumber' is not necessarily preserved when 
+-- The type specified by 'number' is not necessarily preserved when 
 -- a new 'Number' is created --- it uses whatever internal storage type
 -- it deems appropriate.
 {#fun pure unsafe CFNumberGetType as numberType
@@ -111,8 +110,8 @@ instance IsNumberType Int where
 -- TODO: error checking.  (Currently it will do lossy conversion.)
 
 -- | Gets the value in the Number, cast to a specific type.
-numberValue :: forall a . IsNumberType a => Number -> a
-numberValue n = unsafePerformIO $ alloca $ \p -> do
+value :: forall a . IsNumberType a => Number -> a
+value n = unsafePerformIO $ alloca $ \p -> do
                 getNumberValue n (numberTypeOf (undefined :: a)) p
                 peek p
 
@@ -122,24 +121,6 @@ numberValue n = unsafePerformIO $ alloca $ \p -> do
     , castPtr `Ptr a'
     } -> `Number' getOwned* #}
 
-newNumber :: forall a . IsNumberType a => a -> IO Number
-newNumber n = with n $
+number :: forall a . IsNumberType a => a -> Number
+number n = unsafePerformIO $ with n $
                 numberCreate (numberTypeOf (undefined :: a))
-
--- | Creates a new 'Number' object.  
---
--- This function is unsafe since it breaks referential transparency 
--- when the result's underlying 'CFTypeRef' is tested for equality.
--- For example, in the below code @test1@ returns @False@ but @test2@ returns @True@.
---
--- > test1 = do 
--- >            p <- retainCFTypeRef $ unsafeNumber (0::Int)
--- >            q <- retainCFTypeRef $ unsafeNumber (0::Int)
--- >            return (p==q)
--- > test2 = do
--- >            let m = unsafeNumber (0::Int)
--- >            p <- retainCFTypeRef m
--- >            q <- retainCFTypeRef m
--- >            return (p==q)
-unsafeNumber :: IsNumberType a => a -> Number
-unsafeNumber = unsafePerformIO . newNumber

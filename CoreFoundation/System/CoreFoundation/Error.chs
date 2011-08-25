@@ -4,7 +4,7 @@ module System.CoreFoundation.Error (
             -- * The Error type
             Error,
             ErrorRef,
-            newError,
+            cfError,
             -- * Error properties
             errorDescription,
             errorFailureReason,
@@ -56,6 +56,13 @@ importCFStringAs "kCFErrorDomainCocoa" "domainCocoa"
     , `Int'
     , maybeWithObject* `Maybe Dictionary'
     } -> `Error' getOwned* #}
+
+cfError :: String -- ^ The error domain.
+        -> Int -- ^ The error code.
+        -> Maybe Dictionary -- ^ User info.
+        -> Error
+cfError domain code userInfo = unsafePerformIO
+            $ newError domain code userInfo
 
 maybeWithObject Nothing = ($ nullPtr)
 maybeWithObject (Just o) = withObject o

@@ -4,9 +4,10 @@ module System.CoreFoundation.Base(
                 CFTypeRef,
                 Object(),
                 touchObject,
+                -- ** Foreign interaction with 'CFTypeRef's
+                -- $foreign
                 withObject,
                 withObjects,
-                -- ** Foreign interaction with 'CFTypeRef's
                 getOwned,
                 getAndRetain,
                 maybeGetOwned,
@@ -56,6 +57,30 @@ foreign import ccall "CFRelease" cfRelease :: CFTypeRef -> IO ()
 -- at the given place in the sequence of IO events.
 touchObject :: Object a => a -> IO ()
 touchObject = touchForeignPtr . unsafeUnObject
+
+
+{- $foreign
+
+We note one caveat about the foreign export functions.   Namely, the pure
+object constructors like @String.fromChars@ and @Number.newNumber@ break
+referential transparency if the underlying 'CFTypeRef's are tested for equality.  For
+example:
+
+> -- Returns False
+> test1 = let
+>           str1 = fromChars "foo"
+>           str2 = fromChars "foo"
+>         in withObject str1 $ \p1 -> withObject str2 $ \p2 -> return p1==p2
+> 
+> -- Returns True
+> test1 = let
+>           str = fromChars "foo"
+>         in withObject str $ \p1 -> withObject str $ \p2 -> return p1==p2
+
+In general, however, this should not cause problems when using the 
+Core Foundation API functions.
+
+-}
 
 -- | Like 'withForeignPtr', extracts the underlying C type and keeps the object alive
 -- while the given action is running.

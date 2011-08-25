@@ -3,8 +3,7 @@ module System.CoreFoundation.Data(
                 Data,
                 DataRef,
                 getLength,
-                withData,
-                newData,
+                fromByteString,
                 getByteString,
                 ) where
 
@@ -58,7 +57,7 @@ withData d f = do
 getByteString :: Data -> IO B.ByteString
 getByteString d = withData d $ \p n -> B.packCStringLen (castPtr p, cvtEnum n)
 
--- | Makes a new Data object with a copy of the ByteString's data.
-newData :: B.ByteString -> IO Data
-newData b = UnsafeB.unsafeUseAsCStringLen b $ \(p,len) ->
+-- | Makes a new immutable Data object with a copy of the ByteString's data.
+fromByteString :: B.ByteString -> Data
+fromByteString b = unsafePerformIO $ UnsafeB.unsafeUseAsCStringLen b $ \(p,len) ->
                         createData (castPtr p) (toEnum len)

@@ -60,37 +60,37 @@ instance Preference Prelude.String where
     toPreference p = toPreference p `thenMaybe` (fmap Just . getChars)
 
 instance Preference Int8 where
-    toPreference = fmap (fmap numberValue) . toPreference
+    toPreference = fmap (fmap value) . toPreference
 
 instance Preference Int16 where
-    toPreference = fmap (fmap numberValue) . toPreference
+    toPreference = fmap (fmap value) . toPreference
 
 instance Preference Int32 where
-    toPreference = fmap (fmap numberValue) . toPreference
+    toPreference = fmap (fmap value) . toPreference
 
 instance Preference CChar where
-    toPreference = fmap (fmap numberValue) . toPreference
+    toPreference = fmap (fmap value) . toPreference
 
 instance Preference CShort where
-    toPreference = fmap (fmap numberValue) . toPreference
+    toPreference = fmap (fmap value) . toPreference
 
 instance Preference CInt where
-    toPreference = fmap (fmap numberValue) . toPreference
+    toPreference = fmap (fmap value) . toPreference
 
 instance Preference CLong where
-    toPreference = fmap (fmap numberValue) . toPreference
+    toPreference = fmap (fmap value) . toPreference
 
 instance Preference CLLong where
-    toPreference = fmap (fmap numberValue) . toPreference
+    toPreference = fmap (fmap value) . toPreference
 
 instance Preference CFloat where
-    toPreference = fmap (fmap numberValue) . toPreference
+    toPreference = fmap (fmap value) . toPreference
 
 instance Preference CDouble where
-    toPreference = fmap (fmap numberValue) . toPreference
+    toPreference = fmap (fmap value) . toPreference
 
 instance Preference Int where
-    toPreference = fmap (fmap numberValue) . toPreference
+    toPreference = fmap (fmap value) . toPreference
 
 thenMaybe :: Monad m => m (Maybe a) -> (a -> m (Maybe b)) -> m (Maybe b)
 thenMaybe f g = f >>= \mx -> case mx of

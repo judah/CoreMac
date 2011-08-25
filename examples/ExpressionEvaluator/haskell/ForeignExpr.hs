@@ -22,4 +22,4 @@ processInputHelper input = do
     let resultStr = case parse expr "<input>" inputStr of
                     Left err -> show err
                     Right result -> show result
-    newStringFromChars resultStr
+    return $ fromChars resultStr

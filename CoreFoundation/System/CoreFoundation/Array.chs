@@ -6,7 +6,7 @@ module System.CoreFoundation.Array(
                     getCount,
                     getObjectAtIndex,
                     -- * Creating arrays
-                    newArray,
+                    fromList,
                     ) where
 
 
@@ -50,8 +50,9 @@ foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
     , id `Ptr ()'
     } -> `Array' getOwned* #}
 
-newArray :: Object a => [a] -> IO Array
-newArray objs = withObjects objs $ \ps ->
+-- | Returns a new immutable 'Array' which contains the elements of the given list.
+fromList :: Object a => [a] -> Array
+fromList objs = unsafePerformIO $ withObjects objs $ \ps ->
                     withArrayLen ps $ \ n p ->
                         cfArrayCreate p n kCFTypeArrayCallBacks
                         

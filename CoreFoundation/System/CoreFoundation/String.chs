@@ -7,11 +7,10 @@ module System.CoreFoundation.String(
                 newStringFromExternalRepresentation,
                 StringEncoding(..),
                 -- * Conversion to/from 'Prelude.String'
-                newStringFromChars,
+                fromChars,
                 getChars,
-                unsafeStringFromChars,
                 -- * Conversion to/from 'Text'
-                newStringFromText,
+                fromText,
                 getText,
                 -- * Foreign import of string constants
                 importCFString,
@@ -87,37 +86,16 @@ declareCFType "String"
 
 
 
--- | Create a new @CoreFoundation.String@ which contains a copy of the given 'Text'.
-newStringFromText :: Text.Text -> IO String
-newStringFromText t = useAsPtr t $ \p len ->
+-- | Create a new immutable @CoreFoundation.String@ which contains a copy of the given 'Text'.
+fromText :: Text.Text -> String
+fromText t = unsafePerformIO $ useAsPtr t $ \p len ->
                         createStringWithBytes (castPtr p)
                             (cvtEnum $ 2*len) UTF16
                             False -- Text doesn't add a BOM
 
--- | Create a new @CoreFoundation.String@ which contains a copy of the given @Prelude.String@.
-newStringFromChars :: Prelude.String -> IO String
-newStringFromChars = newStringFromText . Text.pack
-
--- | Create a new @CoreFoundation.String@ which contains a copy of the given @Prelude.String@.
---
--- This function is unsafe since it breaks referential transparency 
--- when the result's underlying 'CFTypeRef' is tested for equality.
--- For example, in the below code @test1@ returns @False@ but @test2@ returns @True@.
---
--- > test1 = do 
--- >            p <- retainCFTypeRef $ unsafeStringFromChars "foo"
--- >            q <- retainCFTypeRef $ unsafeStringFromChars "foo"
--- >            return (p==q)
--- > test2 = do
--- >            let s = unsafeStringFromChars "foo"
--- >            p <- retainCFTypeRef s
--- >            q <- retainCFTypeRef s
--- >            return (p==q)
-unsafeStringFromChars :: Prelude.String -> String
-unsafeStringFromChars = unsafePerformIO . newStringFromChars
-
--- As an aside, we don't really need to worry about mutability as regards
--- the safety of the above function, since it only returns immutable strings.
+-- | Create a new immutable @CoreFoundation.String@ which contains a copy of the given @Prelude.String@.
+fromChars :: Prelude.String -> String
+fromChars = fromText . Text.pack
 
 -- | Extract a 'Text' copy of the given @CoreFoundation.String@.
 getText :: String -> IO Text.Text
