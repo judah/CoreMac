@@ -4,6 +4,7 @@ module System.CoreFoundation.Number(
                 Number,
                 NumberRef,
                 newNumber,
+                unsafeNumber,
                 numberValue,
                 numberType,
                 IsNumberType,
@@ -124,3 +125,21 @@ numberValue n = unsafePerformIO $ alloca $ \p -> do
 newNumber :: forall a . IsNumberType a => a -> IO Number
 newNumber n = with n $
                 numberCreate (numberTypeOf (undefined :: a))
+
+-- | Creates a new 'Number' object.  
+--
+-- This function is unsafe since it breaks referential transparency 
+-- when the result's underlying 'CFTypeRef' is tested for equality.
+-- For example, in the below code @test1@ returns @False@ but @test2@ returns @True@.
+--
+-- > test1 = do 
+-- >            p <- retainCFTypeRef $ unsafeNumber (0::Int)
+-- >            q <- retainCFTypeRef $ unsafeNumber (0::Int)
+-- >            return (p==q)
+-- > test2 = do
+-- >            let m = unsafeNumber (0::Int)
+-- >            p <- retainCFTypeRef m
+-- >            q <- retainCFTypeRef m
+-- >            return (p==q)
+unsafeNumber :: IsNumberType a => a -> Number
+unsafeNumber = unsafePerformIO . newNumber

@@ -9,6 +9,7 @@ module System.CoreFoundation.String(
                 -- * Conversion to/from 'Prelude.String'
                 newStringFromChars,
                 getChars,
+                unsafeStringFromChars,
                 -- * Conversion to/from 'Text'
                 newStringFromText,
                 getText,
@@ -96,6 +97,27 @@ newStringFromText t = useAsPtr t $ \p len ->
 -- | Create a new @CoreFoundation.String@ which contains a copy of the given @Prelude.String@.
 newStringFromChars :: Prelude.String -> IO String
 newStringFromChars = newStringFromText . Text.pack
+
+-- | Create a new @CoreFoundation.String@ which contains a copy of the given @Prelude.String@.
+--
+-- This function is unsafe since it breaks referential transparency 
+-- when the result's underlying 'CFTypeRef' is tested for equality.
+-- For example, in the below code @test1@ returns @False@ but @test2@ returns @True@.
+--
+-- > test1 = do 
+-- >            p <- retainCFTypeRef $ unsafeStringFromChars "foo"
+-- >            q <- retainCFTypeRef $ unsafeStringFromChars "foo"
+-- >            return (p==q)
+-- > test2 = do
+-- >            let s = unsafeStringFromChars "foo"
+-- >            p <- retainCFTypeRef s
+-- >            q <- retainCFTypeRef s
+-- >            return (p==q)
+unsafeStringFromChars :: Prelude.String -> String
+unsafeStringFromChars = unsafePerformIO . newStringFromChars
+
+-- As an aside, we don't really need to worry about mutability as regards
+-- the safety of the above function, since it only returns immutable strings.
 
 -- | Extract a 'Text' copy of the given @CoreFoundation.String@.
 getText :: String -> IO Text.Text
