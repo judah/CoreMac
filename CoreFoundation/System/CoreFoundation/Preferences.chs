@@ -7,9 +7,10 @@ module System.CoreFoundation.Preferences(
                 synchronizePrefs,
                 ) where
 
-import Foreign
+import Foreign.Ptr
 import Foreign.C
 import Data.Maybe (fromMaybe)
+import Data.Int
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.Array

@@ -10,8 +10,10 @@ module System.CoreFoundation.Dictionary(
                     fromKeyValues,
                     ) where
 
-import Foreign
+import Foreign.Ptr
 import Foreign.C
+import Foreign (withArray, withArrayLen)
+import System.IO.Unsafe (unsafePerformIO)
 import System.CoreFoundation.Base
 import System.CoreFoundation.Internal.TH
 

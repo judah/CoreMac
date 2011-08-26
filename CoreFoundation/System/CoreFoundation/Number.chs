@@ -11,8 +11,12 @@ module System.CoreFoundation.Number(
                 isFloatType,
                 ) where
 
-import Foreign
+import Foreign.Ptr
+import Foreign.Storable
+import Foreign (with, alloca)
 import Foreign.C
+import System.IO.Unsafe (unsafePerformIO)
+import Data.Int
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.Internal.TH

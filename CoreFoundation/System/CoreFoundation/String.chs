@@ -28,8 +28,11 @@ module System.CoreFoundation.String(
 --    probably kCFStringEncodingUTF16 works fine.  Just need to stop
 --    using a DataRef.
 
-import Foreign
+import Foreign.Ptr
 import Foreign.C
+import Foreign (fromBool, peek)
+import System.IO.Unsafe (unsafePerformIO)
+import Data.Word
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.Internal.TH

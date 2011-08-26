@@ -25,8 +25,9 @@ module System.CoreFoundation.Error (
             underlyingErrorKey,
             ) where
 
-import Foreign
+import Foreign.Ptr
 import Foreign.C
+import System.IO.Unsafe (unsafePerformIO)
 
 import Prelude hiding (String)
 

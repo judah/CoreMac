@@ -10,8 +10,10 @@ module System.CoreFoundation.Array(
                     ) where
 
 
-import Foreign hiding (newArray)
 import Foreign.C
+import Foreign.Ptr
+import Foreign.Marshal (withArrayLen)
+import System.IO.Unsafe (unsafePerformIO)
 import Control.Monad(when)
 import System.CoreFoundation.Base
 import System.CoreFoundation.Internal.TH

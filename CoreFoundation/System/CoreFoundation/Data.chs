@@ -14,11 +14,13 @@ module System.CoreFoundation.Data(
 --  - CFDataCreate is immutable, use it to make funcs pure?
 --  - Mutable data?
 
-import Foreign
+import Foreign.Ptr
 import Foreign.C
+import System.IO.Unsafe (unsafePerformIO)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Unsafe as UnsafeB
 import Control.Exception (finally)
+import Data.Word (Word8)
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.Internal.TH
