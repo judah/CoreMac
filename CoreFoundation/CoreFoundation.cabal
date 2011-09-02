@@ -40,6 +40,7 @@ Library
         System.CoreFoundation
         System.CoreFoundation.Base
         System.CoreFoundation.Array
+        System.CoreFoundation.Bundle
         System.CoreFoundation.Data
         System.CoreFoundation.Error
         System.CoreFoundation.Dictionary
@@ -48,6 +49,7 @@ Library
         System.CoreFoundation.RunLoop
         System.CoreFoundation.String
         System.CoreFoundation.Time
+        System.CoreFoundation.URL
 
         System.CoreFoundation.Internal.TH
 
