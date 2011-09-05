@@ -288,7 +288,7 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ExpressionEvaluator/ExpressionEvaluator-Prefix.pch";
-				HEADER_SEARCH_PATHS = "/Library/Frameworks/GHC.framework/Versions/7.2.1-x86_64/usr/lib/ghc-7.2.1/include";
+				HEADER_SEARCH_PATHS = "/Library/Frameworks/GHC.framework/Versions/Current/usr/lib/ghc-7.2.1/include";
 				INFOPLIST_FILE = "ExpressionEvaluator/ExpressionEvaluator-Info.plist";
 				OTHER_LDFLAGS = (
 					"-Wl,-no_compact_unwind,-no_pie",
@@ -305,7 +305,7 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ExpressionEvaluator/ExpressionEvaluator-Prefix.pch";
-				HEADER_SEARCH_PATHS = "/Library/Frameworks/GHC.framework/Versions/7.2.1-x86_64/usr/lib/ghc-7.2.1/include";
+				HEADER_SEARCH_PATHS = "/Library/Frameworks/GHC.framework/Versions/Current/usr/lib/ghc-7.2.1/include";
 				INFOPLIST_FILE = "ExpressionEvaluator/ExpressionEvaluator-Info.plist";
 				OTHER_LDFLAGS = (
 					"-Wl,-no_compact_unwind,-no_pie",
