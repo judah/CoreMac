@@ -20,7 +20,7 @@ import System.CoreGraphics.AffineTransform
 
 #include "context.h"
 
-declareCFType "Context"
+declareCFTypeAs "CGContext" "Context"
 
 with_ :: Storable a => a -> (Ptr () -> IO c) -> IO c
 with_ x f = with x $ f . castPtr

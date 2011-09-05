@@ -1,6 +1,7 @@
 -- | Short-cuts for repeated foreign interfacing
 module System.CoreFoundation.Internal.TH (
-                    declareCFType
+                    declareCFType,
+                    declareCFTypeAs,
                     ) where
 
 import System.CoreFoundation.Internal.Unsafe
@@ -24,13 +25,16 @@ import Foreign.ForeignPtr
 -- instance StaticTypeID Data where
 --      unsafeStaticTypeID _ = _CFDataGetTypeID
 declareCFType :: String -> Q [Dec]
-declareCFType name = do
+declareCFType name = declareCFTypeAs ("CF" ++ name) name
+
+declareCFTypeAs :: String -> String -> Q [Dec]
+declareCFTypeAs cfname name = do
     let n = mkName name
     p <- newName "p"
     fptr <- [t|ForeignPtr CFType|]
     ptr <- [t| CFTypeRef |]
     
-    let getTypeIDStr = "CF" ++ name ++ "GetTypeID"
+    let getTypeIDStr = cfname ++ "GetTypeID"
     getTypeIDName <- newName ("_" ++ getTypeIDStr)
     importGetTypeID <- forImpD CCall Safe getTypeIDStr getTypeIDName [t|TypeID|]
 
@@ -47,3 +51,5 @@ declareCFType name = do
                                     (NormalB $ VarE getTypeIDName) []]
                             ]
     return [newtypeD,instObject,tySyn,importGetTypeID,instStaticTypeID]
+
+

@@ -18,7 +18,7 @@ import System.CoreGraphics.DataProvider
 #include <ApplicationServices/ApplicationServices.h>
 #include "font.h"
 
-declareCFType "Font"
+declareCFTypeAs "CGFont" "Font"
 
 {#fun unsafe CGFontCreateWithDataProvider as newFontWithDataProvider
     { withObject* `DataProvider'

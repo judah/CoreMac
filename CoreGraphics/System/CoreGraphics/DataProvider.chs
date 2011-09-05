@@ -13,7 +13,7 @@ import System.CoreFoundation.Internal.TH
 
 #include <ApplicationServices/ApplicationServices.h>
 
-declareCFType "DataProvider"
+declareCFTypeAs "CGDataProvider" "DataProvider"
 
 {#fun unsafe CGDataProviderCreateWithFilename as newDataProviderFromFile
     { withCString* `FilePath'
