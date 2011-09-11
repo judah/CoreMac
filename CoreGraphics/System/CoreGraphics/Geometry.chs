@@ -1,6 +1,6 @@
 module System.CoreGraphics.Geometry where
 
-import Foreign
+import Foreign.Storable
 import Foreign.C
 
 #include <ApplicationServices/ApplicationServices.h>

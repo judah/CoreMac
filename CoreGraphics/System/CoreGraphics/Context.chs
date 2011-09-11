@@ -8,7 +8,10 @@ module System.CoreGraphics.Context(
                 setTextMatrix,
                 ) where
 
-import Foreign
+import Foreign.Ptr
+import Foreign.Storable
+import Foreign.Marshal.Utils (with)
+import Foreign.Marshal.Array (withArrayLen)
 import Foreign.C
 
 import System.CoreFoundation.Base

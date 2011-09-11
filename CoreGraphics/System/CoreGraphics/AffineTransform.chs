@@ -1,7 +1,7 @@
 module System.CoreGraphics.AffineTransform where
 
 import System.CoreGraphics.Geometry
-import Foreign
+import Foreign.Storable
 import Foreign.C
 
 #include <ApplicationServices/ApplicationServices.h>

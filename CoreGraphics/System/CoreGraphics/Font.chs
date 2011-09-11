@@ -7,9 +7,11 @@ module System.CoreGraphics.Font(
                     unitsPerEm,
                     ) where
 
-import Foreign
+import Foreign.Ptr
 import Foreign.C
 import Control.Monad
+import System.IO.Unsafe (unsafePerformIO)
+import Foreign.Marshal.Array
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.Internal.TH

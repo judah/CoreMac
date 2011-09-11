@@ -5,7 +5,7 @@ module System.CoreGraphics.DataProvider(
                     newDataProviderFromFile,
                     ) where
 
-import Foreign
+import Foreign.Ptr
 import Foreign.C
 
 import System.CoreFoundation.Base
