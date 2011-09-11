@@ -27,11 +27,12 @@ flag 32bit
 Library
   Exposed-modules:  
         System.CoreGraphics
+        System.CoreGraphics.AffineTransform
         System.CoreGraphics.DataProvider
         System.CoreGraphics.Font
         System.CoreGraphics.Context
         System.CoreGraphics.Geometry
-        System.CoreGraphics.AffineTransform
+        System.CoreGraphics.PDF.Document
 
   c-sources: cbits/context.c
              cbits/font.c
