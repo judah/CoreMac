@@ -37,6 +37,3 @@ declareCFType "Bundle"
     , withMaybeObject* `Maybe String'
     , withMaybeObject* `Maybe String'
     } -> `URL' getOwned* #}
-
-withMaybeObject Nothing = ($ nullPtr)
-withMaybeObject (Just o) = withObject o

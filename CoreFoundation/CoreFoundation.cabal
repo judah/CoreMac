@@ -44,6 +44,7 @@ Library
         System.CoreFoundation.Data
         System.CoreFoundation.Error
         System.CoreFoundation.Dictionary
+        System.CoreFoundation.NotificationCenter
         System.CoreFoundation.Number
         System.CoreFoundation.Preferences
         System.CoreFoundation.RunLoop

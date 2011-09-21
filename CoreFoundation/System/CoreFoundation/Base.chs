@@ -7,6 +7,7 @@ module System.CoreFoundation.Base(
                 -- ** Foreign interaction with 'CFTypeRef's
                 -- $foreign
                 withObject,
+                withMaybeObject,
                 withObjects,
                 getOwned,
                 getAndRetain,
@@ -90,6 +91,11 @@ Core Foundation API functions.
 -- It is not safe in general to use the 'CFTypeRef' after the action completes.
 withObject :: Object a => a -> (CFTypeRef -> IO b) -> IO b
 withObject = withForeignPtr . unsafeUnObject
+
+-- | Like 'withObject', except that if the input is Nothing, the action will be passed a 'nullPtr'.
+withMaybeObject :: Object a => Maybe a -> (CFTypeRef -> IO b) -> IO b
+withMaybeObject Nothing = ($ nullPtr)
+withMaybeObject (Just o) = withObject o
 
 -- | Returns a Haskell type which references the given Core Foundation C object.
 -- The 'CFTypeRef' must not be null.
