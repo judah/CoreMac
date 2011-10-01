@@ -9,6 +9,7 @@ import Foreign.C
 import Prelude hiding (String)
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 import System.CoreFoundation.String
 import System.CoreFoundation.Dictionary

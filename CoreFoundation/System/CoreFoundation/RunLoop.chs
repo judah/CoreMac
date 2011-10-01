@@ -15,6 +15,7 @@ import Control.Monad.Fix
 import Control.Monad(liftM2)
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 
 #include "runloop.h"

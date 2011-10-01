@@ -16,6 +16,7 @@ import Foreign.Marshal (withArrayLen)
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Monad(when)
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 
 declareCFType "Array"

@@ -12,6 +12,7 @@ module System.CoreFoundation.Bundle(
 import Foreign.Ptr
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 import System.CoreFoundation.URL
 import System.CoreFoundation.String

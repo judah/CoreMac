@@ -32,6 +32,7 @@ import System.IO.Unsafe (unsafePerformIO)
 import Prelude hiding (String)
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Dictionary
 import System.CoreFoundation.String as CF
 import System.CoreFoundation.Internal.TH

@@ -19,6 +19,7 @@ import System.IO.Unsafe (unsafePerformIO)
 import Data.Int
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 
 #include <CoreFoundation/CoreFoundation.h>

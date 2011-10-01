@@ -35,6 +35,7 @@ import System.IO.Unsafe (unsafePerformIO)
 import Data.Word
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 import System.CoreFoundation.Data
 

@@ -14,6 +14,7 @@ import System.IO.Unsafe (unsafePerformIO)
 import Foreign.Marshal.Array
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 import System.CoreGraphics.DataProvider
 

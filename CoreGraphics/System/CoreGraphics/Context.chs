@@ -15,6 +15,7 @@ import Foreign.Marshal.Array (withArrayLen)
 import Foreign.C
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 
 import System.CoreGraphics.Geometry

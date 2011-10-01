@@ -23,6 +23,7 @@ import Control.Exception (finally)
 import Data.Word (Word8)
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 
 

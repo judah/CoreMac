@@ -11,6 +11,7 @@ import Foreign.C
 import Foreign.Ptr
 import System.IO.Unsafe (unsafePerformIO)
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 import System.CoreFoundation.String
 import Prelude hiding (String)

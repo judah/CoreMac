@@ -13,6 +13,7 @@ import Data.Maybe (fromMaybe)
 import Data.Int
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Array
 import System.CoreFoundation.Data
 import System.CoreFoundation.Dictionary

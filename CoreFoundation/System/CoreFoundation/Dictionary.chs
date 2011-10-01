@@ -15,6 +15,7 @@ import Foreign.C
 import Foreign (withArray, withArrayLen)
 import System.IO.Unsafe (unsafePerformIO)
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 
 declareCFType "Dictionary"

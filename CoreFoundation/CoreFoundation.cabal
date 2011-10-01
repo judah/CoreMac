@@ -42,8 +42,9 @@ Library
         System.CoreFoundation.Array
         System.CoreFoundation.Bundle
         System.CoreFoundation.Data
-        System.CoreFoundation.Error
         System.CoreFoundation.Dictionary
+        System.CoreFoundation.Error
+        System.CoreFoundation.Foreign
         System.CoreFoundation.NotificationCenter
         System.CoreFoundation.Number
         System.CoreFoundation.Preferences

@@ -10,6 +10,7 @@ import Foreign.Ptr
 import Foreign.C
 
 import System.CoreFoundation.Base
+import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 import System.CoreGraphics.DataProvider
 import System.CoreFoundation.URL
