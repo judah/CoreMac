@@ -1,5 +1,7 @@
 -- | Notification centers.  This is *not* toll-free bridged with @NSNotificationCenter@.
 module System.CoreFoundation.NotificationCenter (
+                            NotificationCenter,
+                            NotificationCenterRef,
                             getLocalCenter,
                             postNotification,
                                 ) where
