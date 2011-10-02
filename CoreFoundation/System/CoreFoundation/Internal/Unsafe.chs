@@ -62,5 +62,24 @@ type CFIndex = {#type CFIndex #}
 type CBoolean = {#type Boolean #}
 
 
+------------------
 
+-- | Some Core Foundation objects (e.g. strings and data) have mutable
+-- variants.  
+-- We use the Haskell types @Mutable Data@, @Mutable String@, etc.
+-- to indicate objects which we know to be mutable.  
+-- 
+-- In contrast, we use the Haskell types @Data@ and @String@ to indicate objects which
+-- may or may not be mutable.
+newtype Mutable o = Mutable o
 
+-- | Convert the Haskell type of a Core Foundation object to its mutable version. 
+--
+--  This function must only be used on objects which you know to be mutable.
+-- Doing otherwise can violate referential transparency or even crash the program.
+unsafeMutable :: o -> Mutable o
+unsafeMutable = Mutable
+
+-- | Extract the underlying object from a mutable type.  
+unMutable :: Mutable o -> o
+unMutable (Mutable o) = o

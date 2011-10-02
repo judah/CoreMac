@@ -1,5 +1,5 @@
 module System.CoreFoundation.Foreign(
-                -- ** Foreign interaction with 'CFTypeRef's
+                -- * Foreign interaction with 'CFTypeRef's
                 -- $foreign
                 -- Marshalling Core Foundation objects to/from Haskell
                 CFType,
@@ -12,7 +12,8 @@ module System.CoreFoundation.Foreign(
                 maybeGetOwned,
                 maybeGetAndRetain,
                 retainCFTypeRef,
-
+                -- * Mutable types
+                unsafeMutable,
                 -- *  Allocators
                 AllocatorRef,
                 withDefaultAllocator,

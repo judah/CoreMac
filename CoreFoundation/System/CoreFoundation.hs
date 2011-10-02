@@ -1,6 +1,7 @@
 module System.CoreFoundation(
             module System.CoreFoundation.Base,
             module System.CoreFoundation.Array,
+            module System.CoreFoundation.Array.Mutable,
             module System.CoreFoundation.Bundle,
             module System.CoreFoundation.Data,
             module System.CoreFoundation.Error,
@@ -16,6 +17,7 @@ module System.CoreFoundation(
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.Array
+import System.CoreFoundation.Array.Mutable
 import System.CoreFoundation.Bundle
 import System.CoreFoundation.Data
 import System.CoreFoundation.Error

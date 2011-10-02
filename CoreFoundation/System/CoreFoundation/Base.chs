@@ -10,11 +10,14 @@ module System.CoreFoundation.Base(
                 dynamicTypeID,
                 staticTypeDescription,
                 dynamicTypeDescription,
-                -- ** Dynamic types
+                -- * Dynamic types
                 DynObj,
                 dyn,
                 castObject,
                 castObjectOrError,
+                -- * Mutable objects
+                Mutable(),
+                unMutable,
                 -- *  Miscellaneous type synonyms
                 CBoolean,
                 CFIndex,

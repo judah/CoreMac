@@ -40,6 +40,7 @@ Library
         System.CoreFoundation
         System.CoreFoundation.Base
         System.CoreFoundation.Array
+        System.CoreFoundation.Array.Mutable
         System.CoreFoundation.Bundle
         System.CoreFoundation.Data
         System.CoreFoundation.Dictionary
