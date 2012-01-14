@@ -147,7 +147,7 @@
 		F7BF664313F361E100DD859B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0410;
+				LastUpgradeCheck = 0420;
 			};
 			buildConfigurationList = F7BF664613F361E100DD859B /* Build configuration list for PBXProject "ExpressionEvaluator" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -192,7 +192,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/Users/judah/.cabal/bin/ghc-xcode -ihaskell -threaded haskell/ForeignExpr.hs\n";
+			shellScript = "$HOME/Library/Haskell/bin/ghc-xcode -ihaskell -threaded haskell/ForeignExpr.hs\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -288,7 +288,7 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ExpressionEvaluator/ExpressionEvaluator-Prefix.pch";
-				HEADER_SEARCH_PATHS = "/Library/Frameworks/GHC.framework/Versions/Current/usr/lib/ghc-7.2.1/include";
+				HEADER_SEARCH_PATHS = _ghc_rts_include;
 				INFOPLIST_FILE = "ExpressionEvaluator/ExpressionEvaluator-Info.plist";
 				OTHER_LDFLAGS = (
 					"-Wl,-no_compact_unwind,-no_pie",
@@ -305,7 +305,7 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ExpressionEvaluator/ExpressionEvaluator-Prefix.pch";
-				HEADER_SEARCH_PATHS = "/Library/Frameworks/GHC.framework/Versions/Current/usr/lib/ghc-7.2.1/include";
+				HEADER_SEARCH_PATHS = _ghc_rts_include;
 				INFOPLIST_FILE = "ExpressionEvaluator/ExpressionEvaluator-Info.plist";
 				OTHER_LDFLAGS = (
 					"-Wl,-no_compact_unwind,-no_pie",

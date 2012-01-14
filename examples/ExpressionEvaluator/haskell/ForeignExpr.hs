@@ -1,6 +1,7 @@
 module ForeignExpr where
 
 import System.CoreFoundation hiding (String)
+import System.CoreFoundation.Foreign
 import qualified System.CoreFoundation as CF
 import Text.ParserCombinators.Parsec
 import Control.Concurrent
