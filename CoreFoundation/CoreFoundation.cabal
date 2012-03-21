@@ -80,3 +80,7 @@ Library
   }
   -- Ugly hack (to get hsc2hs working) until GHC bug #5106 is fixed.
   cc-options: -march=core2 -U__BLOCKS__
+  
+  -- This is needed (rather than frameworks) when linking the TH splice
+  -- when building this package on ghc-7.4.
+  ghc-options: -framework CoreFoundation
