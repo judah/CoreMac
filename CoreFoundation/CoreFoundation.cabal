@@ -60,8 +60,8 @@ Library
         System.CoreFoundation.Internal.Unsafe
 
   -- Packages needed in order to build this package.
-  Build-depends: base>=4.3 && < 4.5, bytestring==0.9.*, text==0.11.*,
-                 template-haskell>=2.5 && < 2.7
+  Build-depends: base>=4.3 && < 4.6, bytestring==0.9.*, text==0.11.*,
+                 template-haskell>=2.5 && < 2.8
   
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
               RecordWildCards, EmptyDataDecls, ExistentialQuantification,

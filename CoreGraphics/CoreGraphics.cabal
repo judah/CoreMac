@@ -39,8 +39,8 @@ Library
   include-dirs: includes
   includes: context.h font.h
   
-  Build-depends: base>=4.3 && < 4.5, bytestring==0.9.*, text==0.11.*,
-                 template-haskell>=2.5 && < 2.7,
+  Build-depends: base>=4.3 && < 4.6, bytestring==0.9.*, text==0.11.*,
+                 template-haskell>=2.5 && < 2.8,
                  CoreFoundation==0.1.*
   
   Extensions: ForeignFunctionInterface, TemplateHaskell
