@@ -17,6 +17,7 @@ import System.CoreFoundation.Array
 
 #include <CoreFoundation/CoreFoundation.h>
 
+{#pointer CFMutableArrayRef as ArrayRef nocode #}
 foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
 
 -- | Create a new mutable array.  The array starts empty and can contain up to the
@@ -29,14 +30,14 @@ foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
 
 {#fun CFArrayAppendValue as appendValue
     `Object o' => { '(withObject . unMutable)'* `Mutable Array'
-    , withObject* `o'
+    , withDynObject* `o'
     } -> `()' #}
 
 {#fun CFArraySetValueAtIndex as c_setValueAtIndex
     `Object o' =>
     { '(withObject . unMutable)'* `Mutable Array'
     , `Int'
-    , withObject* `o'
+    , withDynObject* `o'
     } -> `()' #}
 
 -- | Change the value at the given index in the array.
@@ -53,7 +54,7 @@ setValueAtIndex a i x = do
     `Object o' => 
     { '(withObject . unMutable)'* `Mutable Array'
     , `Int'
-    , withObject* `o'
+    , withDynObject* `o'
     } -> `()' #}
 
 -- | Insert a value into an array at the given index.

@@ -36,17 +36,17 @@ import Control.Monad (when)
 
 -- Retains a Core Foundation object.  Returns the input.
 -- If NULL, causes a crash.
-foreign import ccall "CFRetain" cfRetain :: CFTypeRef -> IO CFTypeRef
+foreign import ccall "CFRetain" cfRetain :: Ptr a -> IO (Ptr a)
 
 -- Releases a Core Foundation object which must not be NULL.
-foreign import ccall "&CFRelease" cfReleasePtr :: FunPtr (CFTypeRef -> IO ())
+foreign import ccall "&CFRelease" cfReleasePtr :: FunPtr (Ptr a -> IO ())
 
 ------------------------------
 
 
 -- Helper
 {#fun CFGetTypeID as cfTypeID
-    { id `CFTypeRef' } -> `TypeID' TypeID #}
+    { castPtr `Ptr a' } -> `TypeID' TypeID #}
 
 {- $foreign
 
@@ -74,16 +74,16 @@ Core Foundation API functions.
 -- | Like 'withForeignPtr', extracts the underlying C type and keeps the object alive
 -- while the given action is running.
 -- It is not safe in general to use the 'CFTypeRef' after the action completes.
-withObject :: Object a => a -> (CFTypeRef -> IO b) -> IO b
+withObject :: Object a => a -> (Ptr (Repr a) -> IO b) -> IO b
 withObject = withForeignPtr . unsafeUnObject
 
 -- | Like 'withObject', except that if the input is Nothing, the action will be passed a 'nullPtr'.
-withMaybeObject :: Object a => Maybe a -> (CFTypeRef -> IO b) -> IO b
+withMaybeObject :: Object a => Maybe a -> (Ptr (Repr a) -> IO b) -> IO b
 withMaybeObject Nothing = ($ nullPtr)
 withMaybeObject (Just o) = withObject o
 
 -- TODO: is this inefficient?
-withObjects :: Object a => [a] -> ([CFTypeRef] -> IO b) -> IO b
+withObjects :: Object a => [a] -> ([Ptr (Repr a)] -> IO b) -> IO b
 withObjects [] act = act []
 withObjects (o:os) act = withObject o $ \p -> withObjects os $ \ps -> act (p:ps)
 
@@ -95,7 +95,7 @@ withObjects (o:os) act = withObject o $ \p -> withObjects os $ \ps -> act (p:ps)
 -- 
 -- At some point after the Haskell type goes out of 
 -- scope, the C object will be automatically released with @CFRelease@.
-getOwned :: forall a . Object a => CFTypeRef -> IO a
+getOwned :: forall a . Object a => Ptr (Repr a) -> IO a
 getOwned p = do
     checkCFTypeRef "getOwned" p $ maybeStaticTypeID (undefined :: a)
     fmap unsafeObject $ newForeignPtr cfReleasePtr p
@@ -103,7 +103,7 @@ getOwned p = do
 -- | Retuns a Haskell type which references the given Core Foundation C object.
 -- This function performs the same as 'getOwned', except that it returns 'Nothing'
 -- if the input is NULL.
-maybeGetOwned :: Object a => CFTypeRef -> IO (Maybe a)
+maybeGetOwned :: Object a => Ptr (Repr a) -> IO (Maybe a)
 maybeGetOwned p
     | p==nullPtr = return Nothing
     | otherwise = fmap Just $ getOwned p
@@ -117,7 +117,7 @@ maybeGetOwned p
 -- This function calls @CFRetain@ on its argument.  At
 -- some point after the Haskell type goes out of 
 -- scope, the C object will be automatically released with @CFRelease@.
-getAndRetain :: forall a . Object a => CFTypeRef -> IO a
+getAndRetain :: forall a . Object a => Ptr (Repr a) -> IO a
 getAndRetain p = do
     checkCFTypeRef "getAndRetain" p $ maybeStaticTypeID (undefined :: a)
     cfRetain p >>= fmap unsafeObject . newForeignPtr cfReleasePtr
@@ -125,14 +125,14 @@ getAndRetain p = do
 -- | Retuns a Haskell type which references the given Core Foundation C object.
 -- This function performs the same as 'getAndRetain', except that it returns 'Nothing'
 -- if the input is NULL.
-maybeGetAndRetain :: Object a => CFTypeRef -> IO (Maybe a)
+maybeGetAndRetain :: Object a => Ptr (Repr a) -> IO (Maybe a)
 maybeGetAndRetain p
     | p==nullPtr = return Nothing
     | otherwise = fmap Just $ getAndRetain p
 
 -- | Checks that the given pointer is non-null and of the right type.
 -- If not, throws an error.
-checkCFTypeRef :: String -> CFTypeRef -> Maybe TypeID -> IO ()
+checkCFTypeRef :: String -> Ptr a -> Maybe TypeID -> IO ()
 checkCFTypeRef descr p maybeStaticID
     | p==nullPtr = error $ descr ++ ": null object"
     | otherwise = case maybeStaticID of
@@ -166,7 +166,7 @@ they depend on the type of memory management used by the foreign code:
     you may use @CFBridgingRelease@ instead of @CFRelease@ to indicate that ARC will be
     responsible for releasing the object. (Untested.)
 -}
-retainCFTypeRef :: Object a => a -> IO CFTypeRef
+retainCFTypeRef :: Object a => a -> IO (Ptr (Repr a))
 retainCFTypeRef x = withObject x cfRetain
 
 --------

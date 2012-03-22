@@ -25,6 +25,7 @@ import System.CoreFoundation.Internal.TH
 #include <CoreFoundation/CoreFoundation.h>
 
 declareCFType "Number"
+{#pointer CFNumberRef as NumberRef nocode#}
 
 -- Since Number doesn't have a mutable analogue, it's OK
 -- for the accessor functions to be mutable.

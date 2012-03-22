@@ -13,12 +13,13 @@ import System.IO.Unsafe (unsafePerformIO)
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
-import System.CoreFoundation.String
+{#import System.CoreFoundation.String#}
 import Prelude hiding (String)
 
 #include <CoreFoundation/CoreFoundation.h>
 
 declareCFType "URL"
+{#pointer CFURLRef as URLRef nocode#}
 
 {#enum define PathStyle
     { kCFURLPOSIXPathStyle as POSIXPathStyle

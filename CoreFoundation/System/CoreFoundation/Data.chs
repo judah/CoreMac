@@ -30,6 +30,7 @@ import System.CoreFoundation.Internal.TH
 #include <CoreFoundation/CoreFoundation.h>
 
 declareCFType "Data"
+{#pointer CFDataRef as DataRef nocode#}
 
 
 {#fun unsafe CFDataGetBytePtr as getBytePtr

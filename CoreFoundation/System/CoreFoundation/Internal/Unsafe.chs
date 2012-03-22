@@ -16,8 +16,9 @@ type CFTypeRef = Ptr CFType
 
 -- | A type class for Haskell types which wrap Core Foundation objects.
 class Object a where
-    unsafeObject :: ForeignPtr CFType -> a
-    unsafeUnObject :: a -> ForeignPtr CFType
+    type Repr a
+    unsafeObject :: ForeignPtr (Repr a) -> a
+    unsafeUnObject :: a -> ForeignPtr (Repr a)
     maybeStaticTypeID :: a -> Maybe TypeID -- Nothing if it's a dynamic type
 
 newtype TypeID = TypeID {unsafeUnTypeID :: {#type CFTypeID #}}

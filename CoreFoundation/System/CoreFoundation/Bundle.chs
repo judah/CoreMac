@@ -14,13 +14,14 @@ import Foreign.Ptr
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
-import System.CoreFoundation.URL
-import System.CoreFoundation.String
+{#import System.CoreFoundation.URL#}
+{#import System.CoreFoundation.String#}
 import Prelude hiding (String)
 
 #include <CoreFoundation/CoreFoundation.h>
 
 declareCFType "Bundle"
+{#pointer CFBundleRef as BundleRef nocode#}
 
 {#fun CFBundleGetMainBundle as getMainBundle
     { } -> `Bundle' getAndRetain* #}

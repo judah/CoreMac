@@ -19,6 +19,7 @@ import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 
 declareCFType "Dictionary"
+{#pointer CFDictionaryRef as DictionaryRef nocode#}
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -28,9 +29,9 @@ declareCFType "Dictionary"
 -- TODO: allow any old type as key?
 
 {#fun unsafe CFDictionaryGetValue as getValue
-    `(Object key, Object value)' => { withObject* `Dictionary' 
-    , withObject* `key'
-    } -> `Maybe value' maybeGetAndRetain* #}
+    `(Object key)' => { withObject* `Dictionary' 
+    , withDynObject* `key'
+    } -> `Maybe DynObj' maybeGetAndRetain* #}
 
 -- There's subtlety around GetValueForKey returning NULL; see the docs.
 -- For now, we'll assume it acts like NSDocument and doesn't have nil values.
@@ -60,9 +61,9 @@ foreign import ccall "&" kCFTypeDictionaryValueCallBacks :: Ptr ()
 fromKeyValues :: (Object key, Object value) => [(key,value)] -> Dictionary
 fromKeyValues kvs = unsafePerformIO $ do
     let (keys,values) = unzip kvs
-    withObjects keys $ \ks -> do
+    withObjects (map dyn keys) $ \ks -> do
     withArrayLen ks $ \n pks -> do
-    withObjects values $ \vs -> do
+    withObjects (map dyn values) $ \vs -> do
     withArray vs $ \pvs -> do
     cfDictionaryCreate pks pvs n
         kCFTypeDictionaryKeyCallBacks

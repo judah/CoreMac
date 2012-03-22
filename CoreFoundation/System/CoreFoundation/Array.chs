@@ -14,12 +14,14 @@ import Foreign.C
 import Foreign.Ptr
 import Foreign.Marshal (withArrayLen)
 import System.IO.Unsafe (unsafePerformIO)
+import Control.Applicative((<$>))
 import Control.Monad(when)
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 
 declareCFType "Array"
+{#pointer CFArrayRef as ArrayRef nocode #}
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -41,7 +43,7 @@ getObjectAtIndex :: Object a => Array -> Int -> IO a
 getObjectAtIndex a k = do
     n <- getCount a
     when (k < 0 || k >= n) $ error $ "getObjectAtIndex: out-of-bounds: " ++ show (k,n)
-    getPtrAtIndex a k >>= getAndRetain
+    castObjectOrError <$> (getPtrAtIndex a k >>= getAndRetain)
 
 -- For when all the elements are CFType-derived.
 foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
@@ -55,7 +57,7 @@ foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
 
 -- | Returns a new immutable 'Array' which contains the elements of the given list.
 fromList :: Object a => [a] -> Array
-fromList objs = unsafePerformIO $ withObjects objs $ \ps ->
+fromList objs = unsafePerformIO $ withObjects (map dyn objs) $ \ps ->
                     withArrayLen ps $ \ n p ->
                         cfArrayCreate p n kCFTypeArrayCallBacks
                         

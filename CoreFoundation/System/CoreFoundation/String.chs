@@ -37,7 +37,7 @@ import Data.Word
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
-import System.CoreFoundation.Data
+{#import System.CoreFoundation.Data#}
 
 import Prelude hiding (String)
 import qualified Prelude
@@ -50,6 +50,7 @@ import Language.Haskell.TH
 #include <CoreFoundation/CoreFoundation.h>
 
 declareCFType "String"
+{#pointer CFStringRef as StringRef nocode#}
 
 {#enum define StringEncoding
     { kCFStringEncodingMacRoman as MacRoman,
@@ -116,7 +117,7 @@ importCFStringAs :: Prelude.String -> Prelude.String -> Q [Dec]
 importCFStringAs foreignStr nameStr = do
     ptrName <- newName (nameStr ++ "Ptr")
     let name = mkName nameStr
-    ptrType <- [t| Ptr CFTypeRef |]
+    ptrType <- [t| Ptr StringRef |]
     expr <- [| unsafePerformIO $ peek $(varE ptrName) >>= getAndRetain |]
     return
         [ ForeignD $ ImportF CCall Safe ("&" ++ foreignStr) ptrName ptrType

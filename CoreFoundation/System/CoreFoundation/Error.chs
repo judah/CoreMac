@@ -33,13 +33,14 @@ import Prelude hiding (String)
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
-import System.CoreFoundation.Dictionary
-import System.CoreFoundation.String as CF
+{#import System.CoreFoundation.Dictionary#}
+{#import System.CoreFoundation.String#} as CF
 import System.CoreFoundation.Internal.TH
 
 #include <CoreFoundation/CoreFoundation.h>
 
 declareCFType "Error"
+{#pointer CFErrorRef as ErrorRef nocode#}
 
 importCFStringAs "kCFErrorLocalizedDescriptionKey" "localizedDescriptionKey"
 importCFStringAs "kCFErrorLocalizedFailureReasonKey" "localizedFailureReasonKey"

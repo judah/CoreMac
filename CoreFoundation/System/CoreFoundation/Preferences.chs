@@ -18,7 +18,7 @@ import System.CoreFoundation.Array
 import System.CoreFoundation.Data
 import System.CoreFoundation.Dictionary
 import System.CoreFoundation.Number
-import System.CoreFoundation.String
+{#import System.CoreFoundation.String#}
 import Prelude hiding (String)
 import qualified Prelude
 

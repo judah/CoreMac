@@ -2,6 +2,7 @@ module System.CoreFoundation.Base(
                 -- * Core Foundation Objects
                 Object(),
                 touchObject,
+                withDynObject,
                 -- * TypeIDs
                 TypeID(),
                 typeIDDescription,
@@ -40,10 +41,12 @@ import System.CoreFoundation.Foreign
 touchObject :: Object a => a -> IO ()
 touchObject = touchForeignPtr . unsafeUnObject
 
+withDynObject :: Object a => a -> (Ptr CFType -> IO b) -> IO b
+withDynObject a k = withObject a (k . castPtr)
 
 -- | Examines the given 'CFTypeRef' to determine its type.
 {#fun pure CFGetTypeID as dynamicTypeID
-    `Object a' => { withObject* `a' } -> `TypeID' TypeID #}
+    `Object a' => { withDynObject* `a' } -> `TypeID' TypeID #}
 
 -- | Returns the 'TypeID' associated with objects of type @a@.  
 -- Does not use its argument.
@@ -75,20 +78,21 @@ dynamicTypeDescription = typeIDDescription . dynamicTypeID
 newtype DynObj = DynObj (ForeignPtr CFType)
 
 instance Object DynObj where
+    type Repr DynObj = CFType
     unsafeObject = DynObj
     unsafeUnObject (DynObj o) = o
     maybeStaticTypeID _ = Nothing
 
 dyn :: Object a => a -> DynObj
-dyn = DynObj . unsafeUnObject
+dyn = DynObj . castForeignPtr . unsafeUnObject
 
 castObject  :: forall a . Object a => DynObj -> Maybe a
 castObject o@(DynObj p) = case maybeStaticTypeID (undefined :: a) of
                     Just t | t /= dynamicTypeID o   -> Nothing
-                    _                               -> Just $ unsafeObject p
+                    _                               -> Just $ unsafeObject (castForeignPtr p)
 
 {#fun CFCopyDescription as getObjectDescription
-    `Object a' => { withObject* `a' } -> `String' peekCFStringRef* #}
+    `Object a' => { withDynObject* `a' } -> `String' peekCFStringRef* #}
 
 -- | Throws an error if the input is not of the given type.
 castObjectOrError :: forall a . Object a => DynObj -> a
@@ -96,6 +100,6 @@ castObjectOrError o@(DynObj p)
     = case maybeStaticTypeID (undefined :: a) of
         Just t | t /= dynamicTypeID o   -> error $ "unsafeCastObject: expected type "
                                             ++ show (typeIDDescription t)
-        _ -> unsafeObject p
+        _ -> unsafeObject (castForeignPtr p)
 
 

@@ -13,12 +13,13 @@ import Prelude hiding (String)
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
-import System.CoreFoundation.String
-import System.CoreFoundation.Dictionary
+{#import System.CoreFoundation.String#}
+{#import System.CoreFoundation.Dictionary#}
 
 #include <CoreFoundation/CoreFoundation.h>
 
 declareCFType "NotificationCenter"
+{#pointer CFNotificationCenterRef as NotificationCenterRef nocode#}
 
 {#fun CFNotificationCenterGetLocalCenter as getLocalCenter
     { } -> `NotificationCenter' getAndRetain* #}

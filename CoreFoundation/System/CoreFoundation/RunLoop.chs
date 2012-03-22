@@ -22,6 +22,7 @@ import System.CoreFoundation.Internal.TH
 #include <CoreFoundation/CoreFoundation.h>
 
 declareCFType "RunLoop"
+{#pointer CFRunLoopRef as RunLoopRef nocode#}
 
 -- | Returns the 'RunLoop' for the current OS thread.  Every OS (i.e., POSIX)
 -- thread has exactly one run loop associated with it.

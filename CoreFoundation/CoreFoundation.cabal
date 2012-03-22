@@ -41,18 +41,18 @@ Library
         System.CoreFoundation.Base
         System.CoreFoundation.Array
         System.CoreFoundation.Array.Mutable
-        System.CoreFoundation.Bundle
         System.CoreFoundation.Data
+        System.CoreFoundation.String
         System.CoreFoundation.Dictionary
+        System.CoreFoundation.URL
+        System.CoreFoundation.Bundle
         System.CoreFoundation.Error
         System.CoreFoundation.Foreign
         System.CoreFoundation.NotificationCenter
         System.CoreFoundation.Number
         System.CoreFoundation.Preferences
         System.CoreFoundation.RunLoop
-        System.CoreFoundation.String
         System.CoreFoundation.Time
-        System.CoreFoundation.URL
 
         System.CoreFoundation.Internal.TH
 
@@ -65,7 +65,7 @@ Library
   
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
               RecordWildCards, EmptyDataDecls, ExistentialQuantification,
-              TypeSynonymInstances, FlexibleInstances
+              TypeSynonymInstances, FlexibleInstances, TypeFamilies
   
   C-sources: cbits/runloop.c
   include-dirs: include
