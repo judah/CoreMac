@@ -58,6 +58,7 @@ Library
 
   Other-modules:  
         System.CoreFoundation.Internal.Unsafe
+        System.CoreFoundation.String.TH
 
   -- Packages needed in order to build this package.
   Build-depends: base>=4.3 && < 4.6, bytestring==0.9.*, text==0.11.*,
@@ -67,9 +68,13 @@ Library
               RecordWildCards, EmptyDataDecls, ExistentialQuantification,
               TypeSynonymInstances, FlexibleInstances, TypeFamilies
   
-  C-sources: cbits/runloop.c
+  C-sources: 
+    cbits/runloop.c
+    cbits/string.c
   include-dirs: include
-  includes: runloop.h
+  includes: 
+    runloop.h 
+    string.h
 
 
   Build-tools: c2hs

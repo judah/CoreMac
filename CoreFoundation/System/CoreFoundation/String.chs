@@ -30,6 +30,7 @@ module System.CoreFoundation.String(
 
 import Foreign.Ptr
 import Foreign.C
+import Foreign.Marshal.Array (allocaArray)
 import Foreign (fromBool, peek)
 import System.IO.Unsafe (unsafePerformIO)
 import Data.Word
@@ -37,6 +38,7 @@ import Data.Word
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
+import System.CoreFoundation.String.TH
 {#import System.CoreFoundation.Data#}
 
 import Prelude hiding (String)
@@ -49,7 +51,6 @@ import Language.Haskell.TH
 
 #include <CoreFoundation/CoreFoundation.h>
 
-declareCFType "String"
 {#pointer CFStringRef as StringRef nocode#}
 
 {#enum define StringEncoding
@@ -104,27 +105,18 @@ fromChars = fromText . Text.pack
 
 -- | Extract a 'Text' copy of the given @CoreFoundation.String@.
 getText :: String -> IO Text.Text
-getText s = do
-    d <- getOwned $ newExternalRepresentation s UTF16LE (cvtEnum '?')
-    fmap Encoding.decodeUtf16LE $ getByteString d
+getText str =
+    withObject str $ \str_p -> do
+      len <- {#call unsafe CFStringGetLength as ^ #} str_p
+      ptr <- {#call unsafe CFStringGetCharactersPtr as ^ #} str_p
+      if ptr /= nullPtr
+        then fromPtr (castPtr ptr) (fromIntegral len)
+        else allocaArray (fromIntegral len) $ \out_ptr -> do
+          {#call unsafe hsCFStringGetCharacters as ^ #} str_p len out_ptr
+          fromPtr (castPtr out_ptr) (fromIntegral len)
 
 -- | Extract a 'Prelude.String' copy of the given @CoreFoundation.String@.
 getChars :: String -> IO Prelude.String
 getChars = fmap Text.unpack . getText
 
 
-importCFStringAs :: Prelude.String -> Prelude.String -> Q [Dec]
-importCFStringAs foreignStr nameStr = do
-    ptrName <- newName (nameStr ++ "Ptr")
-    let name = mkName nameStr
-    ptrType <- [t| Ptr StringRef |]
-    expr <- [| unsafePerformIO $ peek $(varE ptrName) >>= getAndRetain |]
-    return
-        [ ForeignD $ ImportF CCall Safe ("&" ++ foreignStr) ptrName ptrType
-        , SigD name (ConT ''String)
-        , FunD name [Clause [] (NormalB expr) []]
-        ]
-
-
-importCFString :: Prelude.String -> Q [Dec]
-importCFString s = importCFStringAs s s
