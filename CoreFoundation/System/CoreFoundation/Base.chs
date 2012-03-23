@@ -30,7 +30,7 @@ import Foreign.ForeignPtr
 import Foreign.C
 import System.IO.Unsafe (unsafePerformIO)
 
-import System.CoreFoundation.Internal.Unsafe
+{#import System.CoreFoundation.Internal.Unsafe#}
 import System.CoreFoundation.Foreign
 
 #include <CoreFoundation/CoreFoundation.h>

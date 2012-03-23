@@ -46,7 +46,7 @@ instance StaticTypeID (Array a) where
     { withObject* `Array a' } -> `Int' #}
 
 {#fun unsafe CFArrayGetValueAtIndex as getPtrAtIndex
-    { withObject* `Array a', `Int' } -> `Ptr ()' id #}
+    { withObject* `Array a', `Int' } -> `Ptr (Repr a)' castPtr #}
 
 -- TODO: out-of-bounds errors will cause this to crash!
 -- Also, note that this fails if the object isn't of the right type.
@@ -59,7 +59,7 @@ getObjectAtIndex :: Object a => Array a -> Int -> IO a
 getObjectAtIndex a k = do
     n <- getCount a
     when (k < 0 || k >= n) $ error $ "getObjectAtIndex: out-of-bounds: " ++ show (k,n)
-    castObjectOrError <$> (getPtrAtIndex a k >>= getAndRetain)
+    getPtrAtIndex a k >>= getAndRetain
 
 -- For when all the elements are CFType-derived.
 foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()

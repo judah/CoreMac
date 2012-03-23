@@ -33,7 +33,7 @@ importCFString "kCFPreferencesCurrentHost"
 {#fun CFPreferencesCopyAppValue as getPrefDyn
     { withObject* `String'
     , 'withObject kCFPreferencesCurrentApplication'- `String'
-    } -> `Maybe DynObj' maybeGetOwned* #}
+    } -> `Maybe DynObj' '(maybeGetOwned . castPtr)'* #}
 
 
 -- The high-level thingy:

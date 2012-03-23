@@ -50,7 +50,7 @@ instance StaticTypeID (Dictionary k v) where
 
 {#fun unsafe CFDictionaryGetValue as getValue
     `(Object k, Object v)' => { withObject* `Dictionary k v' 
-    , withDynObject* `k'
+    , withVoidObject* `k'
     } -> `Maybe v' '(maybeGetAndRetain . castPtr)'* #}
 
 -- There's subtlety around GetValueForKey returning NULL; see the docs.
@@ -61,8 +61,8 @@ foreign import ccall "&" kCFTypeDictionaryValueCallBacks :: Ptr ()
 
 {#fun CFDictionaryCreate as cfDictionaryCreate
     { withDefaultAllocator- `AllocatorPtr'
-    , id `Ptr CFTypeRef'
-    , id `Ptr CFTypeRef'
+    , castPtr `Ptr (Ptr (Repr k))'
+    , castPtr `Ptr (Ptr (Repr v))'
     , `Int'
     , id `Ptr ()'
     , id `Ptr ()'
@@ -73,9 +73,9 @@ foreign import ccall "&" kCFTypeDictionaryValueCallBacks :: Ptr ()
 fromKeyValues :: (Object k, Object v) => [(k,v)] -> Dictionary k v
 fromKeyValues kvs = unsafePerformIO $ do
     let (keys,values) = unzip kvs
-    withObjects (map dyn keys) $ \ks -> do
+    withObjects keys $ \ks -> do
     withArrayLen ks $ \n pks -> do
-    withObjects (map dyn values) $ \vs -> do
+    withObjects values $ \vs -> do
     withArray vs $ \pvs -> do
     cfDictionaryCreate pks pvs n
         kCFTypeDictionaryKeyCallBacks

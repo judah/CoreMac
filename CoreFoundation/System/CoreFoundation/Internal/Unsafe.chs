@@ -8,11 +8,11 @@ import System.IO.Unsafe (unsafePerformIO)
 
 #include <CoreFoundation/CoreFoundation.h>
 
-type CFType = ()
+data CFType
 
 -- | A reference (i.e., pointer) to a Core Foundation object.  For example,
 -- the C type @CFDataRef@ is represented in Haskell by the @DataRef@ type and marshalled to the @Data@ type.
-type CFTypeRef = Ptr CFType
+{#pointer CFTypeRef -> CFType#}
 
 -- | A type class for Haskell types which wrap Core Foundation objects.
 class Object a where
@@ -41,14 +41,14 @@ class Object a => StaticTypeID a where
     { unsafeUnTypeID `TypeID' } -> `String' peekCFStringRef* #}
 
 foreign import ccall "CFStringGetFileSystemRepresentation"
-        getFileSystemRep :: CFTypeRef -> Ptr CChar -> CFIndex -> IO CBoolean
+        getFileSystemRep :: Ptr () -> Ptr CChar -> CFIndex -> IO CBoolean
 
 foreign import ccall "CFStringGetMaximumSizeOfFileSystemRepresentation"
-        getFileSystemRepMaxSize :: CFTypeRef -> IO CFIndex
+        getFileSystemRepMaxSize :: Ptr () -> IO CFIndex
 
-foreign import ccall "CFRelease" cfRelease :: CFTypeRef -> IO ()
+foreign import ccall "CFRelease" cfRelease :: Ptr () -> IO ()
 
-peekCFStringRef :: CFTypeRef -> IO String
+peekCFStringRef :: Ptr () -> IO String
 peekCFStringRef s = do
     len <- getFileSystemRepMaxSize s
     allocaArray (fromEnum len) $ \p -> do

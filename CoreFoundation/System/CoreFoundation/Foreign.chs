@@ -5,6 +5,7 @@ module System.CoreFoundation.Foreign(
                 CFType,
                 CFTypeRef,
                 withObject,
+                withVoidObject,
                 withMaybeObject,
                 withObjects,
                 getOwned,
@@ -81,6 +82,10 @@ withObject = withForeignPtr . unsafeUnObject
 withMaybeObject :: Object a => Maybe a -> (Ptr (Repr a) -> IO b) -> IO b
 withMaybeObject Nothing = ($ nullPtr)
 withMaybeObject (Just o) = withObject o
+
+-- | Like 'withObject', but casts the ptr to a @void*@
+withVoidObject :: Object a => a -> (Ptr () -> IO b) -> IO b
+withVoidObject obj k = withObject obj (k . castPtr)
 
 -- TODO: is this inefficient?
 withObjects :: Object a => [a] -> ([Ptr (Repr a)] -> IO b) -> IO b

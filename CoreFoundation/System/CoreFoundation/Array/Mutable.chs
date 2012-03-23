@@ -30,14 +30,14 @@ foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
 
 {#fun CFArrayAppendValue as appendValue
     `Object o' => { '(withObject . unMutable)'* `Mutable (Array o)'
-    , withDynObject* `o'
+    , withVoidObject* `o'
     } -> `()' #}
 
 {#fun CFArraySetValueAtIndex as c_setValueAtIndex
     `Object o' =>
     { '(withObject . unMutable)'* `Mutable (Array o)'
     , `Int'
-    , withDynObject* `o'
+    , withVoidObject* `o'
     } -> `()' #}
 
 -- | Change the value at the given index in the array.
@@ -54,7 +54,7 @@ setValueAtIndex a i x = do
     `Object o' => 
     { '(withObject . unMutable)'* `Mutable (Array o)'
     , `Int'
-    , withDynObject* `o'
+    , withVoidObject* `o'
     } -> `()' #}
 
 -- | Insert a value into an array at the given index.
