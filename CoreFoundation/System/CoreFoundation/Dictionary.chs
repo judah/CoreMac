@@ -5,12 +5,12 @@ module System.CoreFoundation.Dictionary(
                     -- * Accessing elements
                     getValueCount,
                     getValue,
-                    getValueOfType,
                     -- * Creating dictionaries
                     fromKeyValues,
                     ) where
 
 import Foreign.Ptr
+import Foreign.ForeignPtr
 import Foreign.C
 import Foreign (withArray, withArrayLen)
 import System.IO.Unsafe (unsafePerformIO)
@@ -18,31 +18,43 @@ import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 
-declareCFType "Dictionary"
-{#pointer CFDictionaryRef as DictionaryRef nocode#}
+{- |
+The CoreFoundation @CFDictionary@ type.
+-}
+data CFDictionary
+{- |
+A dictionary with keys of type @k@ and values of type @v@. Wraps
+@CFDictionaryRef@.
+-}
+newtype Dictionary k v = Dictionary { unDictionary :: ForeignPtr CFDictionary }
+
+-- | The CoreFoundation @CFDictionaryRef@ type.
+{#pointer CFDictionaryRef as DictionaryRef -> CFDictionary#}
+
+instance Object (Dictionary k v) where
+  type Repr (Dictionary k v) = CFDictionary
+  unsafeObject = Dictionary
+  unsafeUnObject = unDictionary
+  maybeStaticTypeID _ = Just _CFDictionaryGetTypeID
+
+foreign import ccall "CFDictioanryGetTypeID" _CFDictionaryGetTypeID :: TypeID
+instance StaticTypeID (Dictionary k v) where
+  unsafeStaticTypeID _ = _CFDictionaryGetTypeID
 
 #include <CoreFoundation/CoreFoundation.h>
 
 {#fun unsafe CFDictionaryGetCount as getValueCount
-    { withObject* `Dictionary' } -> `Int' #}
+    { withObject* `Dictionary k v' } -> `Int' #}
 
 -- TODO: allow any old type as key?
 
 {#fun unsafe CFDictionaryGetValue as getValue
-    `(Object key)' => { withObject* `Dictionary' 
-    , withDynObject* `key'
-    } -> `Maybe DynObj' maybeGetAndRetain* #}
+    `(Object k, Object v)' => { withObject* `Dictionary k v' 
+    , withDynObject* `k'
+    } -> `Maybe v' '(maybeGetAndRetain . castPtr)'* #}
 
 -- There's subtlety around GetValueForKey returning NULL; see the docs.
 -- For now, we'll assume it acts like NSDocument and doesn't have nil values.
-
--- | Returns Nothing if the key was not found in the 'Dictionary', or if the corresponding
--- value is of an incompatible type.
-getValueOfType :: (Object key, Object value) => Dictionary -> key -> IO (Maybe value)
-getValueOfType d k = do
-                mObject <- getValue d k
-                return $ mObject >>= castObject
-                    
 
 foreign import ccall "&" kCFTypeDictionaryKeyCallBacks :: Ptr ()
 foreign import ccall "&" kCFTypeDictionaryValueCallBacks :: Ptr ()
@@ -54,11 +66,11 @@ foreign import ccall "&" kCFTypeDictionaryValueCallBacks :: Ptr ()
     , `Int'
     , id `Ptr ()'
     , id `Ptr ()'
-    } -> `Dictionary' getOwned* #}
+    } -> `Dictionary k v' getOwned* #}
 
 -- | Create a new immutable 'Dictionary' whose keys and values are taken from the given
 -- list.
-fromKeyValues :: (Object key, Object value) => [(key,value)] -> Dictionary
+fromKeyValues :: (Object k, Object v) => [(k,v)] -> Dictionary k v
 fromKeyValues kvs = unsafePerformIO $ do
     let (keys,values) = unzip kvs
     withObjects (map dyn keys) $ \ks -> do

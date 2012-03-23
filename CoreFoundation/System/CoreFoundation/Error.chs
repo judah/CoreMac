@@ -57,12 +57,12 @@ importCFStringAs "kCFErrorDomainCocoa" "domainCocoa"
     { withDefaultAllocator- `AllocatorPtr'
     ,  withObject* `String'
     , `Int'
-    , maybeWithObject* `Maybe Dictionary'
+    , maybeWithObject* `Maybe (Dictionary k v)'
     } -> `Error' getOwned* #}
 
 cfError :: String -- ^ The error domain.
         -> Int -- ^ The error code.
-        -> Maybe Dictionary -- ^ User info.
+        -> Maybe (Dictionary k v) -- ^ User info.
         -> Error
 cfError domain code userInfo = unsafePerformIO
             $ newError domain code userInfo
@@ -81,7 +81,7 @@ maybeWithObject (Just o) = withObject o
     { withObject* `Error' } -> `Maybe String' maybeGetAndRetain* #}
 
 {#fun pure CFErrorCopyUserInfo as userInfo
-    { withObject* `Error' } -> `Maybe Dictionary' maybeGetAndRetain* #}
+    { withObject* `Error' } -> `Maybe (Dictionary k v)' maybeGetAndRetain* #}
 
 {#fun pure CFErrorGetDomain as errorDomain
     { withObject* `Error' } -> `String' getAndRetain* #}

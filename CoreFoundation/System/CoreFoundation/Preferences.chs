@@ -44,8 +44,8 @@ class Preference a where
 --instance Preference Array where
 --    toPreference = return . castObject
 
-instance Preference Dictionary where
-    toPreference = return . castObject
+--instance Preference Dictionary where
+--    toPreference = return . castObject
 
 instance Preference String where
     toPreference = return . castObject

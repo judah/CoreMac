@@ -28,6 +28,6 @@ declareCFType "NotificationCenter"
     { withObject* `NotificationCenter'
     , withObject* `String'
     , id `Ptr ()'
-    , withMaybeObject* `Maybe Dictionary'
+    , withMaybeObject* `Maybe (Dictionary k v)'
     , id `CBoolean'
     } -> `()' #}
