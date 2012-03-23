@@ -30,11 +30,14 @@ import Foreign.ForeignPtr
 import Foreign.C
 import System.IO.Unsafe (unsafePerformIO)
 
-{#import System.CoreFoundation.Internal.Unsafe#}
+import System.CoreFoundation.Internal.Unsafe
 import System.CoreFoundation.Foreign
 
 #include <CoreFoundation/CoreFoundation.h>
-
+-- repeated from System.CoreFoundation.Internal.Unsafe to avoid c2hs dependency errors.
+-- That is, we would prefer to tell c2hs to {#import <...>.Unsafe#}, but since the Unsafe
+-- module is a cabal "Other-Module", c2hs will be run on it *after* it is run on Base.
+{#pointer CFTypeRef nocode#}
 
 -- | Like 'touchForeignPtr', ensures that the object will still be alive
 -- at the given place in the sequence of IO events.
