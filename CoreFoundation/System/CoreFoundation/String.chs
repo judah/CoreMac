@@ -74,26 +74,26 @@ declareCFType "String"
       toEnum `Int',
       cvtEnum `StringEncoding',
       `Bool'
-    } -> `String' getOwned* #}
+    } -> `StringRef' id #}
 
 {#fun unsafe CFStringCreateExternalRepresentation as newExternalRepresentation
     { withDefaultAllocator- `AllocatorPtr',
       withObject* `String',
       cvtEnum `StringEncoding',
       cvtEnum `Word8'
-    } -> `Data' getOwned* #}
+    } -> `DataRef' id #}
 
 {#fun unsafe CFStringCreateFromExternalRepresentation as newStringFromExternalRepresentation
     { withDefaultAllocator- `AllocatorPtr',
       withObject* `Data',
       cvtEnum `StringEncoding'
-    } -> `String' getOwned* #}
+    } -> `StringRef' id #}
 
 
 
 -- | Create a new immutable @CoreFoundation.String@ which contains a copy of the given 'Text'.
 fromText :: Text.Text -> String
-fromText t = unsafePerformIO $ useAsPtr t $ \p len ->
+fromText t = unsafePerformIO $ useAsPtr t $ \p len -> getOwned $
                         createStringWithBytes (castPtr p)
                             (cvtEnum $ 2*len) UTF16
                             False -- Text doesn't add a BOM
@@ -105,7 +105,7 @@ fromChars = fromText . Text.pack
 -- | Extract a 'Text' copy of the given @CoreFoundation.String@.
 getText :: String -> IO Text.Text
 getText s = do
-    d <- newExternalRepresentation s UTF16LE (cvtEnum '?')
+    d <- getOwned $ newExternalRepresentation s UTF16LE (cvtEnum '?')
     fmap Encoding.decodeUtf16LE $ getByteString d
 
 -- | Extract a 'Prelude.String' copy of the given @CoreFoundation.String@.

@@ -30,10 +30,10 @@ importCFString "kCFPreferencesCurrentHost"
 
 -- For now, a very basic API: retrieving preferences for the current application.
 
-{#fun CFPreferencesCopyAppValue as getPrefDyn
+{#fun CFPreferencesCopyAppValue as cfGetPref
     { withObject* `String'
     , 'withObject kCFPreferencesCurrentApplication'- `String'
-    } -> `Maybe DynObj' '(maybeGetOwned . castPtr)'* #}
+    } -> `Ptr CFType' castPtr #}
 
 
 -- The high-level thingy:
@@ -100,7 +100,7 @@ thenMaybe f g = f >>= \mx -> case mx of
                                 Just x -> g x
 
 getPref :: Preference a => String -> IO (Maybe a)
-getPref s = getPrefDyn s `thenMaybe` toPreference
+getPref s = maybeGetOwned (cfGetPref s) `thenMaybe` toPreference
 
 getPrefWithDefault :: Preference a => a -> String -> IO a
 getPrefWithDefault x = fmap (fromMaybe x) . getPref

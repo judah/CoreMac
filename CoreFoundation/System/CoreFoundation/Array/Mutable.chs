@@ -22,11 +22,14 @@ foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
 
 -- | Create a new mutable array.  The array starts empty and can contain up to the
 -- given number of values.
-{#fun CFArrayCreateMutable as newMutableArray
+{#fun CFArrayCreateMutable as cfNewMutableArray
     { withDefaultAllocator- `AllocatorPtr'
     , `Int'
     , '($ kCFTypeArrayCallBacks)'- `Ptr ()'
-    } -> `Mutable (Array a)' '(fmap unsafeMutable . getOwned)'* #}
+    } -> `ArrayRef' id#}
+
+newMutableArray :: Object a => Int -> IO (Mutable (Array a))
+newMutableArray n = fmap unsafeMutable . getOwned $ cfNewMutableArray n
 
 {#fun CFArrayAppendValue as appendValue
     `Object o' => { '(withObject . unMutable)'* `Mutable (Array o)'

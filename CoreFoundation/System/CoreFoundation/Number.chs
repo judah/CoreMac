@@ -121,12 +121,12 @@ value n = unsafePerformIO $ alloca $ \p -> do
                 getNumberValue n (numberTypeOf (undefined :: a)) p
                 peek p
 
-{#fun unsafe CFNumberCreate as numberCreate
+{#fun unsafe CFNumberCreate as cfNumberCreate
     { withDefaultAllocator- `AllocatorPtr'
     , cvtEnum `NumberType'
     , castPtr `Ptr a'
-    } -> `Number' getOwned* #}
+    } -> `NumberRef' id #}
 
 number :: forall a . IsNumberType a => a -> Number
-number n = unsafePerformIO $ with n $
-                numberCreate (numberTypeOf (undefined :: a))
+number n = unsafePerformIO $ with n $ \np -> getOwned $
+                cfNumberCreate (numberTypeOf (undefined :: a)) np

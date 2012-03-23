@@ -69,12 +69,12 @@ foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
     , id `Ptr (Ptr ())'
     , `Int'
     , id `Ptr ()'
-    } -> `Array a' getOwned* #}
+    } -> `ArrayRef' id #}
 
 -- | Returns a new immutable 'Array' which contains the elements of the given list.
 fromList :: Object a => [a] -> Array a
 fromList objs = unsafePerformIO $ withObjects objs $ \ps ->
                     withArrayLen ps $ \ n p ->
-                        cfArrayCreate (castPtr p) n kCFTypeArrayCallBacks
+                        getOwned $ cfArrayCreate (castPtr p) n kCFTypeArrayCallBacks
                         
 

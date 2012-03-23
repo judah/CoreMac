@@ -29,6 +29,7 @@ import Foreign.Marshal (allocaArray)
 import Foreign.C
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Monad (when)
+import Control.Exception (bracketOnError)
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -42,6 +43,17 @@ foreign import ccall "CFRetain" cfRetain :: Ptr a -> IO (Ptr a)
 -- Releases a Core Foundation object which must not be NULL.
 foreign import ccall "&CFRelease" cfReleasePtr :: FunPtr (Ptr a -> IO ())
 
+-- | On a NULL pointer, does nothing. Otherwise, calls 'cfRelease'.
+checkedRelease :: Ptr a -> IO ()
+checkedRelease ptr
+  | ptr == nullPtr = return ()
+  | otherwise = cfRelease ptr
+
+-- | On a NULL pointer, returns NULL. Otherwise, calls 'cfRetain'.
+checkedRetain :: Ptr a -> IO (Ptr a)
+checkedRetain ptr
+  | ptr == nullPtr = return ptr
+  | otherwise = cfRetain ptr
 ------------------------------
 
 
@@ -100,18 +112,25 @@ withObjects (o:os) act = withObject o $ \p -> withObjects os $ \ps -> act (p:ps)
 -- 
 -- At some point after the Haskell type goes out of 
 -- scope, the C object will be automatically released with @CFRelease@.
-getOwned :: forall a . Object a => Ptr (Repr a) -> IO a
-getOwned p = do
-    checkCFTypeRef "getOwned" p $ maybeStaticTypeID (undefined :: a)
-    fmap unsafeObject $ newForeignPtr cfReleasePtr p
+getOwned :: forall a . Object a => IO (Ptr (Repr a)) -> IO a
+getOwned gen = do
+  res <- maybeGetOwned gen
+  case res of
+    Nothing -> fail "System.CoreFoundation.Foreign.getOwned: unexpected NULL object"
+    Just p -> return p
 
 -- | Retuns a Haskell type which references the given Core Foundation C object.
 -- This function performs the same as 'getOwned', except that it returns 'Nothing'
 -- if the input is NULL.
-maybeGetOwned :: Object a => Ptr (Repr a) -> IO (Maybe a)
-maybeGetOwned p
-    | p==nullPtr = return Nothing
-    | otherwise = fmap Just $ getOwned p
+maybeGetOwned :: Object a => IO (Ptr (Repr a)) -> IO (Maybe a)
+maybeGetOwned gen =
+  bracketOnError
+    gen
+    checkedRelease
+    (\ptr ->
+        if ptr == nullPtr
+          then return Nothing
+          else (Just . unsafeObject) `fmap` newForeignPtr cfReleasePtr ptr)
 
 -- | Returns a Haskell type which references the given Core Foundation C object.
 -- The 'CFTypeRef' must not be null.
@@ -172,7 +191,7 @@ they depend on the type of memory management used by the foreign code:
     responsible for releasing the object. (Untested.)
 -}
 retainCFTypeRef :: Object a => a -> IO (Ptr (Repr a))
-retainCFTypeRef x = withObject x cfRetain
+retainCFTypeRef x = withObject x checkedRetain
 
 --------
 

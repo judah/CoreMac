@@ -26,16 +26,25 @@ declareCFType "Bundle"
 {#fun CFBundleGetMainBundle as getMainBundle
     { } -> `Bundle' getAndRetain* #}
 
-{#fun CFBundleCopyExecutableURL as getExecutableURL
-    { withObject* `Bundle' } -> `URL' getOwned* #}
+{#fun CFBundleCopyExecutableURL as cfGetExecutableURL
+    { withObject* `Bundle' } -> `URLRef' id #}
 
-{#fun CFBundleCopyAuxiliaryExecutableURL as getAuxiliaryExecutableURL
+getExecutableURL :: Bundle -> IO URL
+getExecutableURL bundle = getOwned $ cfGetExecutableURL bundle
+
+{#fun CFBundleCopyAuxiliaryExecutableURL as cfGetAuxiliaryExecutableURL
     { withObject* `Bundle' 
-    , withObject* `String' } -> `URL' getOwned* #}
+    , withObject* `String' } -> `URLRef' id #}
 
-{#fun CFBundleCopyResourceURL as getResourceURL
+getAuxiliaryExecutableURL :: Bundle -> String -> IO URL
+getAuxiliaryExecutableURL bundle str = getOwned $ cfGetAuxiliaryExecutableURL bundle str
+
+{#fun CFBundleCopyResourceURL as cfGetResourceURL
     { withObject* `Bundle'
     , withObject* `String'
     , withMaybeObject* `Maybe String'
     , withMaybeObject* `Maybe String'
-    } -> `URL' getOwned* #}
+    } -> `URLRef' id #}
+
+getResourceURL :: Bundle -> String -> Maybe String -> Maybe String -> IO URL
+getResourceURL a b c d = getOwned $ cfGetResourceURL a b c d

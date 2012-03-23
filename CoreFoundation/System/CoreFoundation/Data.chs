@@ -42,11 +42,11 @@ declareCFType "Data"
     { withObject* `Data'
     } -> `CFIndex' id #}
 
-{#fun unsafe CFDataCreate as createData
+{#fun unsafe CFDataCreate as cfCreateData
     { withDefaultAllocator- `AllocatorPtr',
       castPtr `Ptr Word8',
       id `CFIndex'
-    } -> `Data' getOwned* #}
+    } -> `DataRef' id #}
 
 
 -- | Directly access the internal bytes of the Data.
@@ -64,4 +64,4 @@ getByteString d = withData d $ \p n -> B.packCStringLen (castPtr p, cvtEnum n)
 -- | Makes a new immutable Data object with a copy of the ByteString's data.
 fromByteString :: B.ByteString -> Data
 fromByteString b = unsafePerformIO $ UnsafeB.unsafeUseAsCStringLen b $ \(p,len) ->
-                        createData (castPtr p) (toEnum len)
+                        getOwned $ cfCreateData (castPtr p) (toEnum len)

@@ -27,11 +27,16 @@ declareCFType "URL"
     , kCFURLWindowsPathStyle as WindowsPathStyle
     } #}
 
-{#fun pure CFURLCopyFileSystemPath as fileSystemPath
+{#fun CFURLCopyFileSystemPath as cfFileSystemPath
     { withObject* `URL' 
     , cvtEnum `PathStyle'
-    } -> `String' getOwned* #}
+    } -> `StringRef' id #}
 
-{#fun pure CFURLCopyAbsoluteURL as absoluteURL
-    { withObject* `URL' } -> `URL' getOwned* #} 
+fileSystemPath :: URL -> PathStyle -> String
+fileSystemPath url style = unsafePerformIO $ getOwned $ cfFileSystemPath url style
 
+{#fun CFURLCopyAbsoluteURL as cfAbsoluteURL
+    { withObject* `URL' } -> `URLRef' id #} 
+
+absoluteURL :: URL -> URL
+absoluteURL url = unsafePerformIO $ getOwned $ cfAbsoluteURL url

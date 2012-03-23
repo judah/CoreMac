@@ -48,10 +48,13 @@ instance StaticTypeID (Dictionary k v) where
 
 -- TODO: allow any old type as key?
 
-{#fun unsafe CFDictionaryGetValue as getValue
+{#fun unsafe CFDictionaryGetValue as cfGetValue
     `(Object k, Object v)' => { withObject* `Dictionary k v' 
     , withVoidObject* `k'
-    } -> `Maybe v' '(maybeGetAndRetain . castPtr)'* #}
+    } -> `Ptr ()' id #}
+
+getValue :: (Object k, Object v) => Dictionary k v -> k -> Maybe v
+getValue dict k = unsafePerformIO . maybeGetOwned . fmap castPtr $ cfGetValue dict k
 
 -- There's subtlety around GetValueForKey returning NULL; see the docs.
 -- For now, we'll assume it acts like NSDocument and doesn't have nil values.
@@ -61,12 +64,12 @@ foreign import ccall "&" kCFTypeDictionaryValueCallBacks :: Ptr ()
 
 {#fun CFDictionaryCreate as cfDictionaryCreate
     { withDefaultAllocator- `AllocatorPtr'
-    , castPtr `Ptr (Ptr (Repr k))'
-    , castPtr `Ptr (Ptr (Repr v))'
+    , id `Ptr (Ptr ())'
+    , id `Ptr (Ptr ())'
     , `Int'
     , id `Ptr ()'
     , id `Ptr ()'
-    } -> `Dictionary k v' getOwned* #}
+    } -> `DictionaryRef' id #}
 
 -- | Create a new immutable 'Dictionary' whose keys and values are taken from the given
 -- list.
@@ -77,6 +80,7 @@ fromKeyValues kvs = unsafePerformIO $ do
     withArrayLen ks $ \n pks -> do
     withObjects values $ \vs -> do
     withArray vs $ \pvs -> do
-    cfDictionaryCreate pks pvs n
+    getOwned $
+      cfDictionaryCreate (castPtr pks) (castPtr pvs) n
         kCFTypeDictionaryKeyCallBacks
         kCFTypeDictionaryValueCallBacks

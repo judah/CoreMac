@@ -46,7 +46,7 @@ foreign import ccall "CFStringGetFileSystemRepresentation"
 foreign import ccall "CFStringGetMaximumSizeOfFileSystemRepresentation"
         getFileSystemRepMaxSize :: Ptr () -> IO CFIndex
 
-foreign import ccall "CFRelease" cfRelease :: Ptr () -> IO ()
+foreign import ccall "CFRelease" cfRelease :: Ptr a -> IO ()
 
 peekCFStringRef :: Ptr () -> IO String
 peekCFStringRef s = do
