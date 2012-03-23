@@ -26,16 +26,16 @@ foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
     { withDefaultAllocator- `AllocatorPtr'
     , `Int'
     , '($ kCFTypeArrayCallBacks)'- `Ptr ()'
-    } -> `Mutable Array' '(fmap unsafeMutable . getOwned)'* #}
+    } -> `Mutable (Array a)' '(fmap unsafeMutable . getOwned)'* #}
 
 {#fun CFArrayAppendValue as appendValue
-    `Object o' => { '(withObject . unMutable)'* `Mutable Array'
+    `Object o' => { '(withObject . unMutable)'* `Mutable (Array o)'
     , withDynObject* `o'
     } -> `()' #}
 
 {#fun CFArraySetValueAtIndex as c_setValueAtIndex
     `Object o' =>
-    { '(withObject . unMutable)'* `Mutable Array'
+    { '(withObject . unMutable)'* `Mutable (Array o)'
     , `Int'
     , withDynObject* `o'
     } -> `()' #}
@@ -43,7 +43,7 @@ foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
 -- | Change the value at the given index in the array.
 --
 -- The index must be less than the current size of the array.
-setValueAtIndex :: Object o => Mutable Array -> Int -> o -> IO ()
+setValueAtIndex :: Object o => Mutable (Array o) -> Int -> o -> IO ()
 setValueAtIndex a i x = do
     n <- getCount $ unMutable a
     when (i < 0 || i >= n)
@@ -52,7 +52,7 @@ setValueAtIndex a i x = do
 
 {#fun CFArrayInsertValueAtIndex as c_insertValueAtIndex
     `Object o' => 
-    { '(withObject . unMutable)'* `Mutable Array'
+    { '(withObject . unMutable)'* `Mutable (Array o)'
     , `Int'
     , withDynObject* `o'
     } -> `()' #}
@@ -61,7 +61,7 @@ setValueAtIndex a i x = do
 --
 -- The index must be between 0 and N (inclusive), where N is the current
 -- size of the array.
-insertValueAtIndex :: Object o => Mutable Array -> Int -> o -> IO ()
+insertValueAtIndex :: Object o => Mutable (Array o) -> Int -> o -> IO ()
 insertValueAtIndex a i x = do
     n <- getCount $ unMutable a
     when (i < 0 || i > n)

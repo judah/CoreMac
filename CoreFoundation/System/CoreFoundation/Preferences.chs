@@ -41,8 +41,8 @@ importCFString "kCFPreferencesCurrentHost"
 class Preference a where
     toPreference :: DynObj -> IO (Maybe a)
 
-instance Preference Array where
-    toPreference = return . castObject
+--instance Preference Array where
+--    toPreference = return . castObject
 
 instance Preference Dictionary where
     toPreference = return . castObject

@@ -1,12 +1,12 @@
 module System.CoreFoundation.Base(
                 -- * Core Foundation Objects
-                Object(),
+                Object(..),
                 touchObject,
                 withDynObject,
                 -- * TypeIDs
                 TypeID(),
                 typeIDDescription,
-                StaticTypeID,
+                StaticTypeID(..),
                 staticTypeID,
                 dynamicTypeID,
                 staticTypeDescription,
