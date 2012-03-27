@@ -43,7 +43,7 @@ instance StaticTypeID (Dictionary k v) where
 
 #include <CoreFoundation/CoreFoundation.h>
 
-{#fun unsafe CFDictionaryGetCount as getValueCount
+{#fun pure unsafe CFDictionaryGetCount as getValueCount
     { withObject* `Dictionary k v' } -> `Int' #}
 
 -- TODO: allow any old type as key?
