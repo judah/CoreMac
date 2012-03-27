@@ -8,6 +8,8 @@ module System.CoreFoundation.Foreign(
                 withVoidObject,
                 withMaybeObject,
                 withObjects,
+                unsafeObjectToPtr,
+                touch,
                 withMutableObject,
                 getOwned,
                 getAndRetain,
@@ -31,6 +33,7 @@ import Foreign.Marshal (allocaArray)
 import Foreign.C
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Monad (when)
+import Control.Monad.Primitive (touch)
 import Control.Exception (bracketOnError)
 
 #include <CoreFoundation/CoreFoundation.h>
@@ -105,6 +108,13 @@ withVoidObject obj k = withObject obj (k . castPtr)
 withObjects :: Object a => [a] -> ([Ptr (Repr a)] -> IO b) -> IO b
 withObjects [] act = act []
 withObjects (o:os) act = withObject o $ \p -> withObjects os $ \ps -> act (p:ps)
+
+-- | Extract the underlying pointer. Make sure to 'touch' the object after using the 'Ptr',
+-- to make sure that the object isn't finalised while the 'Ptr' is still alive.
+--
+-- Prefer using 'withObject' if possible, which automates the 'touch'ing.
+unsafeObjectToPtr :: Object a => a -> Ptr (Repr a)
+unsafeObjectToPtr = unsafeForeignPtrToPtr . unsafeUnObject
 
 -- | Like 'withObject', except that we use the passed-in *mutable* object as an *immutable* one
 withMutableObject :: Object a => Mutable s a -> (Ptr (Repr a) -> IO b) -> IO b

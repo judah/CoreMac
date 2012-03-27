@@ -57,23 +57,27 @@ Library
         System.CoreFoundation.Internal.TH
 
   Other-modules:  
+        System.CoreFoundation.Array.Internal
         System.CoreFoundation.Internal.Unsafe
         System.CoreFoundation.String.TH
 
   -- Packages needed in order to build this package.
   Build-depends: base>=4.3 && < 4.6, bytestring==0.9.*, text==0.11.*,
                  template-haskell>=2.5 && < 2.8,
-                 primitive >= 0.3 && < 0.5
+                 primitive >= 0.3 && < 0.5,
+                 vector >= 0.5 && < 0.10
   
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
               RecordWildCards, EmptyDataDecls, ExistentialQuantification,
               TypeSynonymInstances, FlexibleInstances, TypeFamilies
   
   C-sources: 
+    cbits/array.c
     cbits/runloop.c
     cbits/string.c
   include-dirs: include
   includes: 
+    array.h
     runloop.h 
     string.h
 

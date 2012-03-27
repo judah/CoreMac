@@ -6,8 +6,11 @@ module System.CoreFoundation.Array(
                     -- * Accessing elements
                     getCount,
                     getObjectAtIndex,
-                    -- * Creating arrays
+                    -- * Conversion
+                    fromVector,
+                    toVector,
                     fromList,
+                    toList,
                     ) where
 
 
@@ -18,9 +21,11 @@ import Foreign.Marshal (withArrayLen)
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Applicative((<$>))
 import Control.Monad(when)
+import System.CoreFoundation.Array.Internal
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
+import qualified Data.Vector as V
 
 -- | The opaque CoreFoundation @CFArray@ type.
 data CFArray
@@ -41,6 +46,7 @@ instance StaticTypeID (Array a) where
   unsafeStaticTypeID _ = _CFArrayGetTypeID
 
 #include <CoreFoundation/CoreFoundation.h>
+#include "array.h"
 
 -- | Returns the number of values currently stored in an array.
 {#fun pure unsafe CFArrayGetCount as getCount
@@ -72,10 +78,28 @@ foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()
     , id `Ptr ()'
     } -> `ArrayRef' id #}
 
--- | Returns a new immutable 'Array' which contains the elements of the given list.
+-- | Build an array from a list
 fromList :: Object a => [a] -> Array a
-fromList objs = unsafePerformIO $ withObjects objs $ \ps ->
-                    withArrayLen ps $ \ n p ->
-                        getOwned $ cfArrayCreate (castPtr p) n kCFTypeArrayCallBacks
+fromList = fromVector . V.fromList
                         
+-- | Convert the array to a list
+toList :: Object a => Array a -> [a]
+toList = V.toList . toVector
 
+-- | Build an array from a vector
+fromVector :: Object a => V.Vector a -> Array a
+fromVector v = 
+    unsafePerformIO $ 
+    withVector v $ \buf len ->
+    getOwned $
+    cfArrayCreate (castPtr buf) (fromIntegral len) kCFTypeArrayCallBacks
+
+-- | Convert the array to a vector
+toVector :: Object a => Array a -> V.Vector a
+toVector a = 
+    unsafePerformIO $
+    withObject a $ \p -> do
+      let len = getCount a
+      (res, _) <- buildVector len $ \buf ->
+        {#call unsafe hsCFArrayGetValues#} p (fromIntegral len) (castPtr buf)
+      return res

@@ -5,8 +5,9 @@ module System.CoreFoundation.Dictionary(
                     -- * Accessing elements
                     getValueCount,
                     getValue,
-                    -- * Creating dictionaries
+                    -- * Conversions
                     fromKeyValues,
+                    toKeyValues,
                     ) where
 
 import Foreign.Ptr
@@ -17,6 +18,8 @@ import System.IO.Unsafe (unsafePerformIO)
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
+import System.CoreFoundation.Array.Internal
+import qualified Data.Vector as V
 
 {- |
 The CoreFoundation @CFDictionary@ type.
@@ -72,15 +75,28 @@ foreign import ccall "&" kCFTypeDictionaryValueCallBacks :: Ptr ()
     } -> `DictionaryRef' id #}
 
 -- | Create a new immutable 'Dictionary' whose keys and values are taken from the given
--- list.
-fromKeyValues :: (Object k, Object v) => [(k,v)] -> Dictionary k v
-fromKeyValues kvs = unsafePerformIO $ do
-    let (keys,values) = unzip kvs
-    withObjects keys $ \ks -> do
-    withArrayLen ks $ \n pks -> do
-    withObjects values $ \vs -> do
-    withArray vs $ \pvs -> do
-    getOwned $
-      cfDictionaryCreate (castPtr pks) (castPtr pvs) n
-        kCFTypeDictionaryKeyCallBacks
-        kCFTypeDictionaryValueCallBacks
+-- vector.
+fromKeyValues :: (Object k, Object v) => V.Vector (k, v) -> Dictionary k v
+fromKeyValues kvs =
+  let (keys, vals) = V.unzip kvs in
+  unsafePerformIO $
+  withVector keys $ \pk len ->
+  withVector vals $ \pv _ ->
+  getOwned $ 
+  cfDictionaryCreate (castPtr pk) (castPtr pv) len
+    kCFTypeDictionaryKeyCallBacks
+    kCFTypeDictionaryValueCallBacks
+
+toKeyValues :: (Object k, Object v) => Dictionary k v -> V.Vector (k, v)
+toKeyValues d =
+  uncurry V.zip $
+  unsafePerformIO $
+  withObject d $ \p ->
+    let len = getValueCount d in
+    buildVector len $ \kp ->
+      fst `fmap` (buildVector len $ \vp ->
+          {#call unsafe CFDictionaryGetKeysAndValues as ^ #} 
+             p 
+             (castPtr kp) 
+             (castPtr vp)
+         )
