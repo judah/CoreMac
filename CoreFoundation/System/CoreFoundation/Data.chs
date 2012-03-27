@@ -38,7 +38,7 @@ declareCFType "Data"
     } -> `Ptr Word8' castPtr #}
 
 -- | Returns the number of bytes stored in the 'Data' object.
-{#fun unsafe CFDataGetLength as getLength
+{#fun pure unsafe CFDataGetLength as getLength
     { withObject* `Data'
     } -> `CFIndex' id #}
 
@@ -54,12 +54,12 @@ declareCFType "Data"
 withData :: Data -> (Ptr Word8 -> CFIndex -> IO a) -> IO a
 withData d f = do
     p <- getBytePtr d
-    len <- getLength d
+    let len = getLength d
     f p len `finally` touchObject d
 
 -- | Makes a new copy of the given data.
-getByteString :: Data -> IO B.ByteString
-getByteString d = withData d $ \p n -> B.packCStringLen (castPtr p, cvtEnum n)
+getByteString :: Data -> B.ByteString
+getByteString d = unsafePerformIO $ withData d $ \p n -> B.packCStringLen (castPtr p, cvtEnum n)
 
 -- | Makes a new immutable Data object with a copy of the ByteString's data.
 fromByteString :: B.ByteString -> Data
