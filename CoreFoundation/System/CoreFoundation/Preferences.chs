@@ -59,7 +59,7 @@ instance Preference Number where
 -- TODO: CFDate and CFBoolean also
 
 instance Preference Prelude.String where
-    toPreference p = toPreference p `thenMaybe` (fmap Just . getChars)
+    toPreference p = toPreference p `thenMaybe` (return . Just . getChars)
 
 instance Preference Int8 where
     toPreference = fmap (fmap value) . toPreference

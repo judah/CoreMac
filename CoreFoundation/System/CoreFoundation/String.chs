@@ -3,9 +3,10 @@ module System.CoreFoundation.String(
                 String,
                 StringRef,
                 -- * Conversion to/from 'Data'
-                newExternalRepresentation,
-                newStringFromExternalRepresentation,
+                encode,
+                decode,
                 StringEncoding(..),
+                ReplacementChar,
                 -- * Conversion to/from 'Prelude.String'
                 fromChars,
                 getChars,
@@ -77,20 +78,27 @@ import Language.Haskell.TH
       `Bool'
     } -> `StringRef' id #}
 
-{#fun unsafe CFStringCreateExternalRepresentation as newExternalRepresentation
+-- | Replacement character to use on invalid input
+type ReplacementChar = Word8
+
+{#fun unsafe CFStringCreateExternalRepresentation as c_newExternalRepresentation
     { withDefaultAllocator- `AllocatorPtr',
       withObject* `String',
       cvtEnum `StringEncoding',
       cvtEnum `Word8'
     } -> `DataRef' id #}
 
-{#fun unsafe CFStringCreateFromExternalRepresentation as newStringFromExternalRepresentation
+encode :: String -> StringEncoding -> ReplacementChar -> Data
+encode str enc rep = unsafePerformIO $ getOwned $ c_newExternalRepresentation str enc rep
+
+{#fun unsafe CFStringCreateFromExternalRepresentation as c_newStringFromExternalRepresentation
     { withDefaultAllocator- `AllocatorPtr',
       withObject* `Data',
       cvtEnum `StringEncoding'
     } -> `StringRef' id #}
 
-
+decode :: Data -> StringEncoding -> String
+decode dat enc = unsafePerformIO $ getOwned $ c_newStringFromExternalRepresentation dat enc
 
 -- | Create a new immutable @CoreFoundation.String@ which contains a copy of the given 'Text'.
 fromText :: Text.Text -> String
@@ -104,8 +112,9 @@ fromChars :: Prelude.String -> String
 fromChars = fromText . Text.pack
 
 -- | Extract a 'Text' copy of the given @CoreFoundation.String@.
-getText :: String -> IO Text.Text
+getText :: String -> Text.Text
 getText str =
+    unsafePerformIO $
     withObject str $ \str_p -> do
       len <- {#call unsafe CFStringGetLength as ^ #} str_p
       ptr <- {#call unsafe CFStringGetCharactersPtr as ^ #} str_p
@@ -116,7 +125,7 @@ getText str =
           fromPtr (castPtr out_ptr) (fromIntegral len)
 
 -- | Extract a 'Prelude.String' copy of the given @CoreFoundation.String@.
-getChars :: String -> IO Prelude.String
-getChars = fmap Text.unpack . getText
+getChars :: String -> Prelude.String
+getChars = Text.unpack . getText
 
 
