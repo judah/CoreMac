@@ -39,6 +39,7 @@ Library
   Exposed-modules:  
         System.CoreFoundation
         System.CoreFoundation.Base
+        System.CoreFoundation.Boolean
         System.CoreFoundation.Array
         System.CoreFoundation.Array.Mutable
         System.CoreFoundation.Data
