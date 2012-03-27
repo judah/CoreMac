@@ -2,6 +2,7 @@
 module System.CoreFoundation.Array(
                     Array,
                     ArrayRef,
+                    CFArray,
                     -- * Accessing elements
                     getCount,
                     getObjectAtIndex,
@@ -42,11 +43,11 @@ instance StaticTypeID (Array a) where
 #include <CoreFoundation/CoreFoundation.h>
 
 -- | Returns the number of values currently stored in an array.
-{#fun unsafe CFArrayGetCount as getCount
+{#fun pure unsafe CFArrayGetCount as getCount
     { withObject* `Array a' } -> `Int' #}
 
-{#fun unsafe CFArrayGetValueAtIndex as getPtrAtIndex
-    { withObject* `Array a', `Int' } -> `Ptr (Repr a)' castPtr #}
+{#fun pure unsafe CFArrayGetValueAtIndex as getPtrAtIndex
+    `Object a' => { withObject* `Array a', `Int' } -> `a' '(getAndRetain . castPtr)'* #}
 
 -- TODO: out-of-bounds errors will cause this to crash!
 -- Also, note that this fails if the object isn't of the right type.
@@ -55,11 +56,11 @@ instance StaticTypeID (Array a) where
 -- 
 -- This function throws an error if the index is out of bounds, 
 -- or if the object cannot be casted to type @a@.
-getObjectAtIndex :: Object a => Array a -> Int -> IO a
-getObjectAtIndex a k = do
-    n <- getCount a
-    when (k < 0 || k >= n) $ error $ "getObjectAtIndex: out-of-bounds: " ++ show (k,n)
-    getPtrAtIndex a k >>= getAndRetain
+getObjectAtIndex :: Object a => Array a -> Int -> a
+getObjectAtIndex a k
+ | k < 0 || k >= n = error $ "getObjectAtIndex: out-of-bounds: " ++ show (k,n)
+ | otherwise = getPtrAtIndex a k
+  where n = getCount a
 
 -- For when all the elements are CFType-derived.
 foreign import ccall "&" kCFTypeArrayCallBacks :: Ptr ()

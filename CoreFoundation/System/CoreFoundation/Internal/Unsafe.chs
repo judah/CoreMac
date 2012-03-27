@@ -1,5 +1,6 @@
 module System.CoreFoundation.Internal.Unsafe where
 
+import Control.Monad.Primitive
 import Foreign.Ptr
 import Foreign.ForeignPtr
 import Foreign.C
@@ -67,20 +68,74 @@ type CBoolean = {#type Boolean #}
 
 -- | Some Core Foundation objects (e.g. strings and data) have mutable
 -- variants.  
--- We use the Haskell types @Mutable Data@, @Mutable String@, etc.
--- to indicate objects which we know to be mutable.  
+-- We use the Haskell types @Mutable s Data@, @Mutable s String@, etc.
+-- to indicate objects which we know to be mutable.  These objects
+-- can be modified in the @ST s@ monad, or the @IO@ monad (see @IOMutable@).
 -- 
 -- In contrast, we use the Haskell types @Data@ and @String@ to indicate objects which
--- may or may not be mutable.
-newtype Mutable o = Mutable o
+-- are known to be immutable.
+newtype Mutable s o = Mutable o
 
--- | Convert the Haskell type of a Core Foundation object to its mutable version. 
---
---  This function must only be used on objects which you know to be mutable.
--- Doing otherwise can violate referential transparency or even crash the program.
-unsafeMutable :: o -> Mutable o
+-- | @Repr (Mutable s o) = MutableRep (Repr o)@
+data MutableRepr repr
+
+instance Object o => Object (Mutable s o) where
+  type Repr (Mutable s o) = MutableRepr (Repr o)
+  unsafeObject = Mutable . unsafeObject . castForeignPtr
+  unsafeUnObject (Mutable o) = castForeignPtr . unsafeUnObject $ o
+  maybeStaticTypeID _ = maybeStaticTypeID (undefined :: o)
+
+-- | Mutable object for use in the 'IO' monad
+type IOMutable = Mutable RealWorld
+
+-- | Mutable object for use in the @ST s@ monad
+type STMutable s = Mutable s
+
 unsafeMutable = Mutable
+unsafeUnMutable (Mutable o) = o
 
--- | Extract the underlying object from a mutable type.  
-unMutable :: Mutable o -> o
-unMutable (Mutable o) = o
+-- | Convert the Haskell type of a Core Foundation object to its mutable version without copying.
+-- The immutable version may not be used after this operation.
+unsafeThaw :: PrimMonad m => o -> m (Mutable (PrimState m) o)
+unsafeThaw = return . Mutable
+{-# NOINLINE unsafeThaw #-}
+
+-- | Convert the Haskell type of a Core Foundation object to its immutable version without copying.
+-- The mutable version may not be used after this operation.
+unsafeFreeze :: PrimMonad m => Mutable (PrimState m) o -> m o
+unsafeFreeze = return . unsafeUnMutable
+{-# NOINLINE unsafeFreeze #-}
+
+{- 
+Note: NOINLINE pragmas
+
+Consider the following use of unsafeFreeze:
+
+  do
+     mstr <- buildNewMutString
+     modifyString mstr
+     str <- unsafeFreeze mstr
+     return (stringToText str)
+
+We expect that the stringToText conversion occurs *after* modifyString has been run.
+However, if unsafeFreeze is inlined, GHC is free to rewrite the above to
+
+  do
+     mstr <- buildNewMutString
+     modifyString mstr
+     let str = unsafeUnMutable mstr
+     return (stringToText str)
+
+and then to
+
+  do 
+     mstr <- buildNewMutString
+     let str = unsafeUnMutable mstr
+         res = stringToText str
+     modifyString mstr
+     return res
+
+and now the stringToText conversion could occur *before* modifyString has run - big mistake!
+
+To prevent GHC making such changes, we mark 'unsafeFreeze' and 'unsafeThaw' NOINLINE.
+-}

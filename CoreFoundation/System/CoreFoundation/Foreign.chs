@@ -8,13 +8,15 @@ module System.CoreFoundation.Foreign(
                 withVoidObject,
                 withMaybeObject,
                 withObjects,
+                withMutableObject,
                 getOwned,
                 getAndRetain,
                 maybeGetOwned,
                 maybeGetAndRetain,
                 retainCFTypeRef,
                 -- * Mutable types
-                unsafeMutable,
+                unsafeFreeze,
+                unsafeThaw,
                 -- *  Allocators
                 AllocatorRef,
                 withDefaultAllocator,
@@ -103,6 +105,10 @@ withVoidObject obj k = withObject obj (k . castPtr)
 withObjects :: Object a => [a] -> ([Ptr (Repr a)] -> IO b) -> IO b
 withObjects [] act = act []
 withObjects (o:os) act = withObject o $ \p -> withObjects os $ \ps -> act (p:ps)
+
+-- | Like 'withObject', except that we use the passed-in *mutable* object as an *immutable* one
+withMutableObject :: Object a => Mutable s a -> (Ptr (Repr a) -> IO b) -> IO b
+withMutableObject = withObject . unsafeUnMutable
 
 -- | Returns a Haskell type which references the given Core Foundation C object.
 -- The 'CFTypeRef' must not be null.

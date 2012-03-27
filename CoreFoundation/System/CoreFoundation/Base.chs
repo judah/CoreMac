@@ -18,7 +18,9 @@ module System.CoreFoundation.Base(
                 castObjectOrError,
                 -- * Mutable objects
                 Mutable(),
-                unMutable,
+                unsafeFreeze,
+                unsafeThaw,
+                MutableRepr,
                 -- *  Miscellaneous type synonyms
                 CBoolean,
                 CFIndex,

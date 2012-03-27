@@ -62,7 +62,8 @@ Library
 
   -- Packages needed in order to build this package.
   Build-depends: base>=4.3 && < 4.6, bytestring==0.9.*, text==0.11.*,
-                 template-haskell>=2.5 && < 2.8
+                 template-haskell>=2.5 && < 2.8,
+                 primitive >= 0.3 && < 0.5
   
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
               RecordWildCards, EmptyDataDecls, ExistentialQuantification,
