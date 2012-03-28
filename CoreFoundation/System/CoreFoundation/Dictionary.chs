@@ -3,8 +3,8 @@ module System.CoreFoundation.Dictionary(
                     Dictionary,
                     DictionaryRef,
                     -- * Accessing elements
-                    getValueCount,
-                    getValue,
+                    size,
+                    lookup,
                     -- * Conversions
                     fromKeyValues,
                     toKeyValues,
@@ -20,6 +20,7 @@ import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 import System.CoreFoundation.Array.Internal
 import qualified Data.Vector as V
+import Prelude hiding (lookup)
 
 {- |
 The CoreFoundation @CFDictionary@ type.
@@ -46,7 +47,7 @@ instance StaticTypeID (Dictionary k v) where
 
 #include <CoreFoundation/CoreFoundation.h>
 
-{#fun pure unsafe CFDictionaryGetCount as getValueCount
+{#fun pure unsafe CFDictionaryGetCount as size
     { withObject* `Dictionary k v' } -> `Int' #}
 
 -- TODO: allow any old type as key?
@@ -56,8 +57,8 @@ instance StaticTypeID (Dictionary k v) where
     , withVoidObject* `k'
     } -> `Ptr ()' id #}
 
-getValue :: (Object k, Object v) => Dictionary k v -> k -> Maybe v
-getValue dict k = unsafePerformIO . maybeGetOwned . fmap castPtr $ cfGetValue dict k
+lookup :: (Object k, Object v) => Dictionary k v -> k -> Maybe v
+lookup dict k = unsafePerformIO . maybeGetOwned . fmap castPtr $ cfGetValue dict k
 
 -- There's subtlety around GetValueForKey returning NULL; see the docs.
 -- For now, we'll assume it acts like NSDocument and doesn't have nil values.
@@ -92,7 +93,7 @@ toKeyValues d =
   uncurry V.zip $
   unsafePerformIO $
   withObject d $ \p ->
-    let len = getValueCount d in
+    let len = size d in
     buildVector len $ \kp ->
       fst `fmap` (buildVector len $ \vp ->
           {#call unsafe CFDictionaryGetKeysAndValues as ^ #} 
