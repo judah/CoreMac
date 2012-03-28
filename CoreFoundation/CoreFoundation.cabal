@@ -51,6 +51,7 @@ Library
         System.CoreFoundation.Foreign
         System.CoreFoundation.NotificationCenter
         System.CoreFoundation.Number
+        System.CoreFoundation.PropertyList
         System.CoreFoundation.Preferences
         System.CoreFoundation.RunLoop
         System.CoreFoundation.Time
@@ -72,7 +73,7 @@ Library
   
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
               RecordWildCards, EmptyDataDecls, ExistentialQuantification,
-              TypeSynonymInstances, FlexibleInstances, TypeFamilies
+              TypeSynonymInstances, FlexibleInstances, TypeFamilies, ViewPatterns
   
   C-sources: 
     cbits/array.c
