@@ -20,9 +20,10 @@ Description:         This package provides bindings to the Core Foundation API f
                      package with @cabal install -f32bit@.
 License:             BSD3
 License-file:        LICENSE
-Author:              Judah Jacobson
+Author:              Judah Jacobson, Reiner Pope
 Maintainer:          judah.jacobson@gmail.com
 Copyright:           Copyright (c) 2011 Judah Jacobson
+                     Copyright (C) 2012 Reiner Pope
 Category:            System
 Build-type:          Simple
 Cabal-version:       >=1.6
