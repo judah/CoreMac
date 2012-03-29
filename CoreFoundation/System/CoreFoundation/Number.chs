@@ -1,14 +1,19 @@
 -- | 'Number' is a class which wraps basic C scalar (numeric) types.
 -- It is toll-free bridged with 'NSNumber'.
 module System.CoreFoundation.Number(
+                -- * Types
                 Number,
                 NumberRef,
+                -- * Converting to basic types
                 number,
                 value,
+                NumberType(..),
                 numberType,
                 IsNumberType,
-                NumberType(..),
                 isFloatType,
+                -- * Simple view
+                NumberView,
+                viewNumber,
                 ) where
 
 import Foreign.Ptr
@@ -56,7 +61,7 @@ declareCFType "Number"
     , kCFNumberCGFloatType as CGFloatType
     } deriving (Show,Eq) #}
 
--- Returns the type used by the 'Number' object to store its value. 
+-- | Returns the type used by the 'Number' object to store its value. 
 -- 
 -- The type specified by 'number' is not necessarily preserved when 
 -- a new 'Number' is created --- it uses whatever internal storage type
@@ -144,6 +149,7 @@ value n = unsafePerformIO $ alloca $ \p -> do
     , castPtr `Ptr a'
     } -> `NumberRef' id #}
 
+-- | Convert to a 'Number'.
 number :: forall a . IsNumberType a => a -> Number
 number n = unsafePerformIO $ with n $ \np -> getOwned $
                 cfNumberCreate (numberTypeOf (undefined :: a)) np

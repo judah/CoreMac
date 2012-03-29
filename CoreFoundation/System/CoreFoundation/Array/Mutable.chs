@@ -19,6 +19,7 @@ import System.CoreFoundation.Foreign
 
 #include <CoreFoundation/CoreFoundation.h>
 
+-- | Mutable arrays
 type MArray s a = Mutable s (Array a)
 
 type MArrayRef = Ptr (MutableRepr CFArray)
@@ -40,9 +41,19 @@ getCount arr = unsafePrimToPrim $ c_getCount arr
 {#fun unsafe CFArrayGetCount as c_getCount
     { withMutableObject* `Mutable s (Array a)' } -> `Int' #}
 
+{- | 
+Construct an empty array with the given capacity.
+    
+  [capacity] The maximum number of values that can be contained by the new array. The array starts empty and can grow to this number of values (and it can have less). Pass 0 to specify that the maximum capacity is not limited. The value must not be negative.
+-}
 newMutableArray :: (PrimMonad m, Object a) => Int -> m (MArray (PrimState m) a)
 newMutableArray n = unsafePrimToPrim . getOwned $ cfNewMutableArray n
 
+{- |
+Adds a value to an array giving it the new largest index. If the array is a limited-capacity array and it is full before this operation, the behavior is undefined.
+
+  [Discussion] The value parameter is assigned to the index one larger than the previous largest index and the count of the Array is increased by one.
+-}
 appendValue :: (PrimMonad m, Object a) => MArray (PrimState m) a -> a -> m ()
 appendValue arr v  = unsafePrimToPrim $ c_appendValue arr v
 
