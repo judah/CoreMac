@@ -27,8 +27,8 @@ flag 32bit
 Library
   Exposed-modules:  
         System.CoreGraphics
-        System.CoreGraphics.AffineTransform
         System.CoreGraphics.DataProvider
+        System.CoreGraphics.AffineTransform
         System.CoreGraphics.Font
         System.CoreGraphics.Context
         System.CoreGraphics.Geometry
@@ -44,7 +44,7 @@ Library
                  CoreFoundation==0.1.*
   
   Extensions: ForeignFunctionInterface, TemplateHaskell
-              RecordWildCards, EmptyDataDecls
+              RecordWildCards, EmptyDataDecls, TypeFamilies
   
   Build-tools: c2hs
 

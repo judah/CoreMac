@@ -16,16 +16,20 @@ import Foreign.Marshal.Array
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
-import System.CoreGraphics.DataProvider
+{#import System.CoreGraphics.DataProvider#}
 
 #include <ApplicationServices/ApplicationServices.h>
 #include "font.h"
 
 declareCFTypeAs "CGFont" "Font"
+{#pointer CGFontRef as FontRef nocode#}
 
-{#fun unsafe CGFontCreateWithDataProvider as newFontWithDataProvider
+newFontWithDataProvider :: DataProvider -> IO Font
+newFontWithDataProvider dp = getOwned $ cgNewFontWithDataProvider dp
+
+{#fun unsafe CGFontCreateWithDataProvider as cgNewFontWithDataProvider
     { withObject* `DataProvider'
-    } -> `Font' getOwned* #}
+    } -> `FontRef' id #}
 
 type Glyph = {#type CGGlyph #}
 

@@ -19,12 +19,13 @@ import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 
 import System.CoreGraphics.Geometry
-import System.CoreGraphics.Font
+{#import System.CoreGraphics.Font#}
 import System.CoreGraphics.AffineTransform
 
 #include "context.h"
 
 declareCFTypeAs "CGContext" "Context"
+{#pointer CGContextRef as ContextRef nocode#}
 
 with_ :: Storable a => a -> (Ptr () -> IO c) -> IO c
 with_ x f = with x $ f . castPtr

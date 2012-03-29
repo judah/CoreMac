@@ -12,18 +12,25 @@ import Foreign.C
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
-import System.CoreGraphics.DataProvider
+{#import System.CoreGraphics.DataProvider#}
 import System.CoreFoundation.URL
 
 #include <QuartzCore/QuartzCore.h>
 
 declareCFTypeAs "CGPDFDocument" "PDFDocument"
+{#pointer CGPDFDocumentRef as PDFDocumentRef nocode#}
 
-{#fun CGPDFDocumentCreateWithProvider as newPDFDocumentWithProvider
-    { withObject* `DataProvider' } -> `PDFDocument' getOwned* #}
+newPDFDocumentWithProvider :: DataProvider -> IO PDFDocument
+newPDFDocumentWithProvider dp = getOwned $ cgNewPDFDocumentWithProvider dp
 
-{#fun CGPDFDocumentCreateWithURL as newPDFDocumentWithURL
-    { withObject* `URL' } -> `PDFDocument' getOwned* #}
+{#fun CGPDFDocumentCreateWithProvider as cgNewPDFDocumentWithProvider
+    { withObject* `DataProvider' } -> `PDFDocumentRef' id #}
+
+newPDFDocumentWithURL :: URL -> IO PDFDocument
+newPDFDocumentWithURL url = getOwned $ cgNewPDFDocumentWithURL url
+
+{#fun CGPDFDocumentCreateWithURL as cgNewPDFDocumentWithURL
+    { withObject* `URL' } -> `PDFDocumentRef' id #}
 
 {#fun CGPDFDocumentGetNumberOfPages as getNumberOfPages
     { withObject* `PDFDocument' } -> `Int' #}
