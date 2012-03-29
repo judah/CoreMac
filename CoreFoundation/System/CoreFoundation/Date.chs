@@ -1,17 +1,32 @@
--- | CoreFoundation @CFDate@. See <https://developer.apple.com/library/mac/#documentation/CoreFoundation/Reference/CFDateRef/Reference/reference.html>
+-- | CoreFoundation @CFDate@ and @CFAbsoluteTime@. See <https://developer.apple.com/library/mac/#documentation/CoreFoundation/Reference/CFDateRef/Reference/reference.html>
 module System.CoreFoundation.Date(
   -- * Types
+  -- $dateversusabs
+  -- ** Date
   Date,
   DateRef,
-  -- * Conversion
-  toUTCTime,
-  fromUTCTime,
+  -- ** AbsoluteTime
+  AbsoluteTime(..),
+  -- * Conversions
+  -- ** Date/AbsoluteTime
+  date2abs,
+  abs2date,
+  -- ** Date/UTCTime
+  date2utc,
+  utc2date,
+  -- ** AbsoluteTime/UTCTime
+  abs2utc,
+  utc2abs,
+  -- * System routines
+  getCurrentTime,
+  -- * Epoch
+  appleEpoch,
   ) where
 
 #include <CoreFoundation/CFDate.h>
 
 import System.IO.Unsafe (unsafePerformIO)
-import Data.Time
+import Data.Time hiding (getCurrentTime)
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
@@ -20,23 +35,65 @@ import Foreign.Ptr
 import Data.Typeable
 import Control.DeepSeq
 
+{- $dateversusabs
+'AbsoluteTime' and 'Date' are similar types: 'AbsoluteTime' is a plain C value type
+representing time in seconds since the 'appleEpoch'; 'Date' is CoreFoundation 
+object which wraps 'AbsoluteTime', and may be put in CoreFoundation containers.
+-}
+
 declareCFType "Date"
 {#pointer CFDateRef as DateRef nocode#}
 
--- | Convert to a 'UTCTime'
-toUTCTime :: Date -> UTCTime
-toUTCTime o = getAbsTime o `addUTCTime` appleEpoch
+deriving instance Typeable Date
+instance Show Date where
+  show = show . date2utc
+instance Eq Date where
+  a == b = date2abs a == date2abs b
+instance Ord Date where
+  compare a b = compare (date2abs a) (date2abs b)
+instance NFData Date
 
-{#fun pure unsafe CFDateGetAbsoluteTime as getAbsTime
-  { withObject* `Date' } -> `NominalDiffTime' realToFrac#}
+-- | Absolute time representing seconds since the 'appleEpoch'.
+newtype AbsoluteTime = AbsoluteTime { unAbsoluteTime :: {#type CFAbsoluteTime #} }
+  deriving (Eq, Ord, Real, Fractional, Typeable, Num)
 
--- | Convert from a 'UTCTime'
-fromUTCTime :: UTCTime -> Date
-fromUTCTime t = unsafePerformIO $ getOwned $ dateCreate (t `diffUTCTime` appleEpoch)
+instance NFData AbsoluteTime
+
+instance Show AbsoluteTime where
+  show = show . abs2utc
+
+----- Conversions
+-- Date/AbsoluteTime
+{#fun pure unsafe CFDateGetAbsoluteTime as date2abs
+  { withObject* `Date' } -> `AbsoluteTime' AbsoluteTime#}
+
+abs2date :: AbsoluteTime -> Date
+abs2date t = unsafePerformIO $ getOwned $ dateCreate t
 
 {#fun unsafe CFDateCreate as dateCreate
-  { withDefaultAllocator- `AllocatorPtr', realToFrac `NominalDiffTime' } -> `DateRef' id#}
+  { withDefaultAllocator- `AllocatorPtr', unAbsoluteTime `AbsoluteTime' } -> `DateRef' id#}
 
+-- AbsoluteTime/UTCTime
+abs2utc :: AbsoluteTime -> UTCTime
+abs2utc t = realToFrac t `addUTCTime` appleEpoch
+
+utc2abs :: UTCTime -> AbsoluteTime
+utc2abs t = realToFrac (t `diffUTCTime` appleEpoch)
+
+-- Date/UTCTime
+date2utc :: Date -> UTCTime
+date2utc = abs2utc . date2abs
+
+utc2date :: UTCTime -> Date
+utc2date = abs2date . utc2abs
+
+------ System calls
+-- | Get the current time
+{#fun unsafe CFAbsoluteTimeGetCurrent as getCurrentTime
+    {} -> `AbsoluteTime' AbsoluteTime #}
+
+----- Epoch
+-- | Midnight, January 1, 2001.
 appleEpoch :: UTCTime
 appleEpoch = 
   UTCTime{
@@ -44,11 +101,5 @@ appleEpoch =
     utctDayTime = 0
     }
 
-deriving instance Typeable Date
-instance Show Date where
-  show = show . toUTCTime
-instance Eq Date where
-  a == b = toUTCTime a == toUTCTime b
-instance Ord Date where
-  compare a b = compare (toUTCTime a) (toUTCTime b)
-instance NFData Date
+
+

@@ -54,7 +54,6 @@ Library
         System.CoreFoundation.PropertyList
         System.CoreFoundation.Preferences
         System.CoreFoundation.RunLoop
-        System.CoreFoundation.Time
         System.CoreFoundation.Date
 
         System.CoreFoundation.Internal.TH
