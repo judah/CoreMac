@@ -11,6 +11,8 @@ module System.CoreFoundation.Array(
                     toVector,
                     fromList,
                     toList,
+                    -- * Marshalling assistance
+                    getOwnedArray,
                     ) where
 
 
@@ -25,6 +27,7 @@ import System.CoreFoundation.Array.Internal
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
+import Data.Maybe (fromMaybe)
 import qualified Data.Vector as V
 
 -- | The opaque CoreFoundation @CFArray@ type.
@@ -103,3 +106,12 @@ toVector a =
       (res, _) <- buildVector len $ \buf ->
         {#call unsafe hsCFArrayGetValues#} p (fromIntegral len) (castPtr buf)
       return res
+
+------ Marshalling
+{- |
+CoreFoundation represents empty arrays by null pointers, which
+may not be passed to 'getOwned'. Instead, use this scheme for wrapping
+arrays, which ensures that the resulting 'ArrayRef' is non-null.
+-}
+getOwnedArray :: Object a => IO ArrayRef -> IO (Array a)
+getOwnedArray = fmap (fromMaybe (fromVector V.empty)) . maybeGetOwned

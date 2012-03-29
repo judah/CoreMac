@@ -16,6 +16,7 @@ module System.CoreFoundation.Foreign(
                 maybeGetOwned,
                 maybeGetAndRetain,
                 retainCFTypeRef,
+                ensureTrue,
                 -- * Mutable types
                 unsafeFreeze,
                 unsafeThaw,
@@ -34,7 +35,7 @@ import Foreign.C
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Monad (when)
 import Control.Monad.Primitive (touch)
-import Control.Exception (bracketOnError)
+import Control.Exception (Exception, throw, bracketOnError)
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -209,6 +210,11 @@ they depend on the type of memory management used by the foreign code:
 retainCFTypeRef :: Object a => a -> IO (Ptr (Repr a))
 retainCFTypeRef x = withObject x checkedRetain
 
+{- |
+If the boolean is true (nonzero), returns @()@, otherwise throws the exception.
+-}
+ensureTrue :: Exception e => e -> CBoolean -> IO ()
+ensureTrue exc b = if b == 0 then throw exc else return ()
 --------
 
 

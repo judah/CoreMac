@@ -73,7 +73,8 @@ Library
   
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
               RecordWildCards, EmptyDataDecls, ExistentialQuantification,
-              TypeSynonymInstances, FlexibleInstances, TypeFamilies, ViewPatterns
+              TypeSynonymInstances, FlexibleInstances, TypeFamilies, ViewPatterns,
+              DeriveDataTypeable
   
   C-sources: 
     cbits/array.c

@@ -33,9 +33,12 @@ import qualified Data.Text as T
 import Foreign.Ptr
 import Foreign.ForeignPtr
 
+#include <CoreFoundation/CoreFoundation.h>
+
 -- | The CoreFoundation @CFPropertyList@ type
 data CFPropertyList
 type PlistRef = Ptr CFPropertyList
+{#pointer CFPropertyListRef as PlistRef nocode#}
 
 {- |
 Wraps the @CFPropertyListRef@ type. This is understood to be a
