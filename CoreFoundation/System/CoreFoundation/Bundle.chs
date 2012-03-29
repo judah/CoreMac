@@ -9,10 +9,8 @@ module System.CoreFoundation.Bundle(
                     getAuxiliaryExecutableURL,
                     ) where
 
-import Foreign.Ptr
 import Foreign.C.Types
 
-import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 {#import System.CoreFoundation.URL#}

@@ -30,9 +30,7 @@ import System.CoreFoundation.Internal.Unsafe
 
 import Foreign.Ptr
 import Foreign.ForeignPtr
-import Foreign.Marshal (allocaArray)
 import Foreign.C
-import System.IO.Unsafe (unsafePerformIO)
 import Control.Monad (when)
 import Control.Monad.Primitive (touch)
 import Control.Exception (Exception, throw, bracketOnError)

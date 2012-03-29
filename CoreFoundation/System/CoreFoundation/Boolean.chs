@@ -10,7 +10,6 @@ module System.CoreFoundation.Boolean(
 
 #include <CoreFoundation/CoreFoundation.h>
 
-import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 import System.IO.Unsafe (unsafePerformIO)

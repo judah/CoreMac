@@ -32,13 +32,12 @@ module System.CoreFoundation.String(
 import Foreign.Ptr
 import Foreign.C
 import Foreign.Marshal.Array (allocaArray)
-import Foreign (fromBool, peek)
+import Foreign (fromBool)
 import System.IO.Unsafe (unsafePerformIO)
 import Data.Word
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
-import System.CoreFoundation.Internal.TH
 import System.CoreFoundation.String.TH
 {#import System.CoreFoundation.Data#}
 
@@ -46,9 +45,7 @@ import Prelude hiding (String)
 import qualified Prelude
 
 import qualified Data.Text as Text
-import qualified Data.Text.Encoding as Encoding
 import Data.Text.Foreign (useAsPtr, fromPtr)
-import Language.Haskell.TH
 
 #include <CoreFoundation/CoreFoundation.h>
 

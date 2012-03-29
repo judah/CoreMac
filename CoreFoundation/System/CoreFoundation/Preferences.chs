@@ -37,11 +37,9 @@ module System.CoreFoundation.Preferences(
   ) where
 
 import Prelude hiding(String)
-import Control.Applicative
 import Control.Exception (Exception)
 import Data.Typeable
 import Foreign.C.Types
-import Foreign.Ptr
 
 {#import System.CoreFoundation.Array#}
 {#import System.CoreFoundation.String#}

@@ -24,12 +24,6 @@ import System.CoreFoundation.Data
 import System.CoreFoundation.Array
 import System.CoreFoundation.Dictionary
 
-import Control.Arrow((***))
-import Control.Applicative
-import Data.Typeable
-import qualified Data.Vector as V
-import qualified Data.Text as T
-
 import Foreign.Ptr
 import Foreign.ForeignPtr
 

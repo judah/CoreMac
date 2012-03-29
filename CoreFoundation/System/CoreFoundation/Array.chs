@@ -19,10 +19,7 @@ module System.CoreFoundation.Array(
 import Foreign.C
 import Foreign.ForeignPtr
 import Foreign.Ptr
-import Foreign.Marshal (withArrayLen)
 import System.IO.Unsafe (unsafePerformIO)
-import Control.Applicative((<$>))
-import Control.Monad(when)
 import System.CoreFoundation.Array.Internal
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign

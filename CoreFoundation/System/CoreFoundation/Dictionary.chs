@@ -13,7 +13,6 @@ module System.CoreFoundation.Dictionary(
 import Foreign.Ptr
 import Foreign.ForeignPtr
 import Foreign.C
-import Foreign (withArray, withArrayLen)
 import System.IO.Unsafe (unsafePerformIO)
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign

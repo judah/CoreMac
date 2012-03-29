@@ -10,11 +10,8 @@ module System.CoreFoundation.RunLoop(
 import Foreign
 import Foreign.C
 import Control.Concurrent
-import Control.Concurrent.MVar
 import Control.Monad.Fix
-import Control.Monad(liftM2)
 
-import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 

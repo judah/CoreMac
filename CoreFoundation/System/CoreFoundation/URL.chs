@@ -8,7 +8,6 @@ module System.CoreFoundation.URL(
                 ) where
 
 import Foreign.C
-import Foreign.Ptr
 import System.IO.Unsafe (unsafePerformIO)
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
