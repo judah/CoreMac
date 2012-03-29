@@ -30,9 +30,6 @@ declareCFType "RunLoop"
 {#fun CFRunLoopGetMain as getMainRunLoop
     { } -> `RunLoop' getAndRetain* #}
 
-foreign import ccall "CFRunLoopGetCurrent" cfRunLoopGetCurrent :: IO (Ptr ())
-foreign import ccall "CFRunLoopGetMain" cfRunLoopGetMain :: IO (Ptr ())
-
 {#fun queueFunctionForRunLoop
     { withObject* `RunLoop'
     , id `Ptr ()'

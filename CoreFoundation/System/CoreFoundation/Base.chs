@@ -3,6 +3,7 @@ module System.CoreFoundation.Base(
                 Object(..),
                 touchObject,
                 withDynObject,
+                getObjectDescription,
                 -- * TypeIDs
                 TypeID(),
                 typeIDDescription,
