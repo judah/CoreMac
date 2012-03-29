@@ -22,7 +22,8 @@ class Object a where
     unsafeUnObject :: a -> ForeignPtr (Repr a)
     maybeStaticTypeID :: a -> Maybe TypeID -- Nothing if it's a dynamic type
 
-newtype TypeID = TypeID {unsafeUnTypeID :: {#type CFTypeID #}}
+type CFTypeID = {#type CFTypeID#}
+newtype TypeID = TypeID {unsafeUnTypeID :: CFTypeID}
             deriving Eq
 
 class Object a => StaticTypeID a where

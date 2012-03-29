@@ -17,7 +17,7 @@ import Foreign (withArray, withArrayLen)
 import System.IO.Unsafe (unsafePerformIO)
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
-import System.CoreFoundation.Internal.TH
+import System.CoreFoundation.Internal.Unsafe (TypeID(..))
 import System.CoreFoundation.Array.Internal
 import qualified Data.Vector as V
 import Prelude hiding (lookup)

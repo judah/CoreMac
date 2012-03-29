@@ -21,9 +21,9 @@ import Foreign.ForeignPtr
 --      type Repr Data = CFData
 --      unsafeObject = Data
 --      unsafeUnObject (Data p) = p
---      maybeStaticTypeID_ = Just _CFDataGetTypeID
+--      maybeStaticTypeID_ = Just (TypeID _CFDataGetTypeID)
 -- type DataRef = Ptr CFData
--- foreign import ccall "CFDataGetTypeID" as _CFDataGetTypeID :: IO TypeID
+-- foreign import ccall "CFDataGetTypeID" as _CFDataGetTypeID :: CFTypeID
 -- instance StaticTypeID Data where
 --      unsafeStaticTypeID _ = _CFDataGetTypeID
 declareCFType :: String -> Q [Dec]
@@ -39,7 +39,8 @@ declareCFTypeAs cfname name = do
     
     let getTypeIDStr = cfname ++ "GetTypeID"
     getTypeIDName <- newName ("_" ++ getTypeIDStr)
-    importGetTypeID <- forImpD CCall Safe getTypeIDStr getTypeIDName [t|TypeID|]
+    importGetTypeID <- forImpD CCall Safe getTypeIDStr getTypeIDName [t|CFTypeID|]
+    typeIDExpr <- [| TypeID $(varE getTypeIDName) |]
 
     let newtypeD = NewtypeD [] n [] (NormalC n [(NotStrict, fptr)]) []
     let dataD = DataD [] dn [] [] []
@@ -47,13 +48,13 @@ declareCFTypeAs cfname name = do
                 [ FunD 'unsafeObject [Clause [] (NormalB $ ConE n) []]
                 , FunD 'unsafeUnObject [Clause [ConP n [VarP p]]
                                     (NormalB $ VarE p) []]
-                , FunD 'maybeStaticTypeID [Clause [WildP] (NormalB $ ConE 'Just `AppE` VarE getTypeIDName) []]
+                , FunD 'maybeStaticTypeID [Clause [WildP] (NormalB $ ConE 'Just `AppE` typeIDExpr) []]
                 , TySynInstD ''Repr [ConT n] (ConT dn)
                 ]
     let tySyn = TySynD (mkName $ name ++ "Ref") [] ptr
     let instStaticTypeID = InstanceD [] (ConT ''StaticTypeID`AppT` ConT n)
                             [ FunD 'unsafeStaticTypeID [Clause [WildP]
-                                    (NormalB $ VarE getTypeIDName) []]
+                                    (NormalB $ typeIDExpr) []]
                             ]
     return [dataD,newtypeD,instObject,tySyn,importGetTypeID,instStaticTypeID]
 

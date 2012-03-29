@@ -10,6 +10,7 @@ module System.CoreFoundation.Bundle(
                     ) where
 
 import Foreign.Ptr
+import Foreign.C.Types
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign

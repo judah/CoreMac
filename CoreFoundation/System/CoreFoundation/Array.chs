@@ -26,7 +26,7 @@ import Control.Monad(when)
 import System.CoreFoundation.Array.Internal
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
-import System.CoreFoundation.Internal.TH
+import System.CoreFoundation.Internal.Unsafe(TypeID(..))
 import Data.Maybe (fromMaybe)
 import qualified Data.Vector as V
 
