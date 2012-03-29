@@ -46,7 +46,7 @@ instance Object (Dictionary k v) where
   unsafeUnObject = unDictionary
   maybeStaticTypeID _ = Just _CFDictionaryGetTypeID
 
-foreign import ccall "CFDictioanryGetTypeID" _CFDictionaryGetTypeID :: TypeID
+foreign import ccall "CFDictionaryGetTypeID" _CFDictionaryGetTypeID :: TypeID
 instance StaticTypeID (Dictionary k v) where
   unsafeStaticTypeID _ = _CFDictionaryGetTypeID
 
