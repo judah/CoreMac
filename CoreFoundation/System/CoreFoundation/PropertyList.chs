@@ -14,6 +14,8 @@ module System.CoreFoundation.PropertyList(
 
 import Prelude hiding(String)
 import qualified Prelude
+import Data.Typeable
+import Control.DeepSeq
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.String
@@ -102,3 +104,14 @@ data PlistView
  | Data !Data
  | Array !(Array Plist)
  | Dictionary !(Dictionary String Plist)
+  deriving(Show, Eq, Ord, Typeable)
+
+instance NFData PlistView
+
+instance Show Plist where
+  show = show . viewPlist
+instance Eq Plist where
+  a == b = viewPlist a == viewPlist b
+instance Ord Plist where
+  compare a b = compare (viewPlist a) (viewPlist b)
+instance NFData Plist  

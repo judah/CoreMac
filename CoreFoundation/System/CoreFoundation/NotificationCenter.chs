@@ -9,6 +9,9 @@ module System.CoreFoundation.NotificationCenter (
 import Foreign.Ptr
 import Foreign.C
 import Prelude hiding (String)
+import System.IO.Unsafe (unsafePerformIO)
+import Data.Typeable
+import Control.DeepSeq
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
@@ -31,3 +34,13 @@ declareCFType "NotificationCenter"
     , withMaybeObject* `Maybe (Dictionary k v)'
     , id `CBoolean'
     } -> `()' #}
+
+deriving instance Typeable NotificationCenter
+instance NFData NotificationCenter
+-- | 'Eq' defined on the underlying pointer
+deriving instance Eq NotificationCenter
+-- | 'Ord' defined on the underlying pointer
+deriving instance Ord NotificationCenter
+-- | 'Show' defined using 'getObjectDescription'
+instance Show NotificationCenter where
+  show = unsafePerformIO . getObjectDescription

@@ -19,7 +19,12 @@ import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.Unsafe (TypeID(..))
 import System.CoreFoundation.Array.Internal
 import qualified Data.Vector as V
+import qualified Data.Vector.Algorithms.Intro as VA
 import Prelude hiding (lookup)
+import Data.Typeable
+import Control.DeepSeq
+import Data.Ord (comparing)
+import Data.List (intercalate)
 
 {- |
 The CoreFoundation @CFDictionary@ type.
@@ -30,6 +35,7 @@ A dictionary with keys of type @k@ and values of type @v@. Wraps
 @CFDictionaryRef@.
 -}
 newtype Dictionary k v = Dictionary { unDictionary :: ForeignPtr CFDictionary }
+  deriving Typeable
 
 -- | The CoreFoundation @CFDictionaryRef@ type.
 {#pointer CFDictionaryRef as DictionaryRef -> CFDictionary#}
@@ -87,6 +93,7 @@ fromKeyValues kvs =
     kCFTypeDictionaryKeyCallBacks
     kCFTypeDictionaryValueCallBacks
 
+-- | Inverse of 'fromKeyValues'
 toKeyValues :: (Object k, Object v) => Dictionary k v -> V.Vector (k, v)
 toKeyValues d =
   uncurry V.zip $
@@ -100,3 +107,19 @@ toKeyValues d =
              (castPtr kp) 
              (castPtr vp)
          )
+
+-- | 'toKeyValues', then sort ascending by key; analogous to @Data.Map.toAscList@
+toAscKeyValues :: (Ord k, Object k, Object v) => Dictionary k v -> V.Vector (k, v)
+toAscKeyValues = V.modify (VA.sortBy (comparing fst)) . toKeyValues
+
+instance (Object k, Object v, Show k, Show v) => Show (Dictionary k v) where
+  show = interCommas . V.map showPair . toKeyValues
+    where
+      showPair (k, v) = show k ++ ":" ++ show v
+      interCommas = intercalate ", " . V.toList
+instance (Object k, Object v, Ord k, Eq v) => Eq (Dictionary k v) where
+  a == b = toAscKeyValues a == toAscKeyValues b
+-- | Equality by converting to a 'Map'
+instance (Object k, Object v, Ord k, Ord v) => Ord (Dictionary k v) where
+  compare a b = compare (toAscKeyValues a) (toAscKeyValues b)
+instance NFData (Dictionary k v)

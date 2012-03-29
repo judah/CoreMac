@@ -17,6 +17,8 @@ import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 import Foreign.C
 import Foreign.Ptr
+import Data.Typeable
+import Control.DeepSeq
 
 declareCFType "Date"
 {#pointer CFDateRef as DateRef nocode#}
@@ -41,3 +43,12 @@ appleEpoch =
     utctDay = fromGregorian 2001 1 1,
     utctDayTime = 0
     }
+
+deriving instance Typeable Date
+instance Show Date where
+  show = show . toUTCTime
+instance Eq Date where
+  a == b = toUTCTime a == toUTCTime b
+instance Ord Date where
+  compare a b = compare (toUTCTime a) (toUTCTime b)
+instance NFData Date

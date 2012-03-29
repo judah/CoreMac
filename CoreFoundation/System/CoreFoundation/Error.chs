@@ -36,6 +36,8 @@ import System.CoreFoundation.Foreign
 {#import System.CoreFoundation.Dictionary#}
 {#import System.CoreFoundation.String#} as CF
 import System.CoreFoundation.Internal.TH
+import Data.Typeable
+import Control.DeepSeq
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -89,4 +91,14 @@ maybeWithObject (Just o) = withObject o
 {#fun pure CFErrorGetCode as errorCode
     { withObject* `Error' } -> `CFIndex' id #} 
 
+toPair :: Error -> (String, CFIndex)
+toPair err = (errorDomain err, errorCode err)
 
+deriving instance Typeable Error
+instance NFData Error
+instance Eq Error where
+  a == b = toPair a == toPair b
+instance Ord Error where
+  compare a b = compare (toPair a) (toPair b)
+instance Show Error where
+  show = getChars . errorDescription

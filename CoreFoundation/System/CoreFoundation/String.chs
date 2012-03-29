@@ -43,6 +43,9 @@ import System.CoreFoundation.String.TH
 
 import Prelude hiding (String)
 import qualified Prelude
+import qualified Data.String as S
+import Data.Typeable
+import Control.DeepSeq
 
 import qualified Data.Text as Text
 import Data.Text.Foreign (useAsPtr, fromPtr)
@@ -125,4 +128,13 @@ getText str =
 getChars :: String -> Prelude.String
 getChars = Text.unpack . getText
 
-
+deriving instance Typeable String
+instance S.IsString String where
+  fromString = fromText . Text.pack
+instance Show String where
+  show = show . getText
+instance Eq String where
+  a == b = getText a == getText b
+instance Ord String where
+  compare a b = compare (getText a) (getText b)
+instance NFData String

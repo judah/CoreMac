@@ -69,12 +69,14 @@ Library
                  template-haskell>=2.5 && < 2.8,
                  primitive >= 0.3 && < 0.5,
                  vector >= 0.5 && < 0.10,
-                 time < 1.5
+                 time < 1.5,
+                 deepseq >= 1.1 && < 1.4,
+                 vector-algorithms < 0.6
   
   Extensions: ForeignFunctionInterface, TemplateHaskell, ScopedTypeVariables
               RecordWildCards, EmptyDataDecls, ExistentialQuantification,
               TypeSynonymInstances, FlexibleInstances, TypeFamilies, ViewPatterns,
-              DeriveDataTypeable
+              DeriveDataTypeable, GeneralizedNewtypeDeriving, StandaloneDeriving
   
   C-sources: 
     cbits/array.c

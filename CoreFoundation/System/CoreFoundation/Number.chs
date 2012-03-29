@@ -17,6 +17,8 @@ import Foreign (with, alloca)
 import Foreign.C
 import System.IO.Unsafe (unsafePerformIO)
 import Data.Int
+import Data.Typeable
+import Control.DeepSeq
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
@@ -74,6 +76,9 @@ instance IsNumberType Int16 where
 instance IsNumberType Int32 where
     numberTypeOf _ = Int32Type
 
+instance IsNumberType Int64 where
+    numberTypeOf _ = Int64Type
+
 instance IsNumberType CChar where
     numberTypeOf _ = CCharType
 
@@ -107,6 +112,18 @@ instance IsNumberType Int where
                             8 -> Int64Type
                             _ -> error "Unknown size of Int"
 
+instance IsNumberType Float where
+    numberTypeOf _ = case sizeOf (0 :: Float) of
+                            4 -> Float32Type
+                            8 -> Float64Type
+                            _ -> error "Unknown size of Float"
+
+instance IsNumberType Double where
+    numberTypeOf _ = case sizeOf (0 :: Double) of
+                            4 -> Float32Type
+                            8 -> Float64Type
+                            _ -> error "Unknown size of Double"
+
 {#fun unsafe CFNumberGetValue as getNumberValue
     { withObject* `Number'
     , cvtEnum `NumberType'
@@ -130,3 +147,24 @@ value n = unsafePerformIO $ alloca $ \p -> do
 number :: forall a . IsNumberType a => a -> Number
 number n = unsafePerformIO $ with n $ \np -> getOwned $
                 cfNumberCreate (numberTypeOf (undefined :: a)) np
+
+-- | A generic \"number\". The 'Eq' and 'Ord' instances respect
+-- the structure of the type, but not the numeric structure.
+data NumberView
+ = I !Int64
+ | D !Double
+  deriving(Eq, Ord, Show, Typeable)
+instance NFData NumberView
+
+viewNumber :: Number -> NumberView
+viewNumber n = if isFloatType n then D (value n) else I (value n)
+
+
+deriving instance Typeable Number
+instance Show Number where
+  show = show . viewNumber
+instance Eq Number where
+  a == b = viewNumber a == viewNumber b
+instance Ord Number where
+  compare a b = compare (viewNumber a) (viewNumber b)
+instance NFData Number

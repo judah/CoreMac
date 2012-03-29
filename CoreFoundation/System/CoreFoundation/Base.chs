@@ -2,8 +2,9 @@ module System.CoreFoundation.Base(
                 -- * Core Foundation Objects
                 Object(..),
                 touchObject,
-                withDynObject,
                 getObjectDescription,
+                hash,
+                equal,
                 -- * TypeIDs
                 TypeID(),
                 typeIDDescription,
@@ -28,10 +29,14 @@ module System.CoreFoundation.Base(
                 cvtEnum,
                 ) where
 
+import Foreign.Marshal (toBool)
 import Foreign.Ptr
 import Foreign.ForeignPtr
 import Foreign.C
 import System.IO.Unsafe (unsafePerformIO)
+import Data.Typeable
+import Control.DeepSeq
+
 
 import System.CoreFoundation.Internal.Unsafe
 import System.CoreFoundation.Foreign
@@ -46,9 +51,6 @@ import System.CoreFoundation.Foreign
 -- at the given place in the sequence of IO events.
 touchObject :: Object a => a -> IO ()
 touchObject = touchForeignPtr . unsafeUnObject
-
-withDynObject :: Object a => a -> (Ptr CFType -> IO b) -> IO b
-withDynObject a k = withObject a (k . castPtr)
 
 -- | Examines the given 'CFTypeRef' to determine its type.
 {#fun pure CFGetTypeID as dynamicTypeID
@@ -82,6 +84,9 @@ dynamicTypeDescription = typeIDDescription . dynamicTypeID
 
 -- | A 'DynObj' wraps a Core Foundation object of unknown type.
 newtype DynObj = DynObj (ForeignPtr CFType)
+  deriving Typeable
+
+instance NFData DynObj
 
 instance Object DynObj where
     type Repr DynObj = CFType
@@ -109,3 +114,25 @@ castObjectOrError o@(DynObj p)
         _ -> unsafeObject (castForeignPtr p)
 
 
+-------------------- Determining equality
+{- |
+Determines whether two Core Foundation objects are considered equal.
+
+ [Discussion] Equality is something specific to each Core Foundation opaque type. For example, two CFNumber objects are equal if the numeric values they represent are equal. Two CFString objects are equal if they 
+represent identical sequences of characters, regardless of encoding.
+-}
+{#fun pure unsafe CFEqual as equal
+  `Object a' => { withDynObject* `a', withDynObject* `a' } -> `Bool' #}
+
+--------- Hashing
+-- | type used for CoreFoundation hashes. Use 'fromIntegral' for conversions as necessary.
+newtype HashCode = HashCode {#type CFHashCode#}
+  deriving (Bounded, Enum, Eq, Integral, Num, Ord, Real, Show)
+
+{- |
+Returns a code that can be used to identify an object in a hashing structure.
+
+ [Discussion] Two objects that are equal (as determined by the 'equal' function) have the same hashing value. However, the converse is not true: two objects with the same hashing value might not be equal. That is, hashing values are not necessarily unique. The hashing value for an object might change from release to release or from platform to platform.
+-}
+{#fun pure unsafe CFHash as hash
+  `Object a' => { withDynObject* `a' } -> `HashCode' HashCode #}

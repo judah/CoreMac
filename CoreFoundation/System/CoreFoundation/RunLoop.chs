@@ -7,11 +7,16 @@ module System.CoreFoundation.RunLoop(
                     queueIOAndWait,
                     ) where
 
-import Foreign
+import Foreign.Ptr
+import Foreign.StablePtr
 import Foreign.C
 import Control.Concurrent
 import Control.Monad.Fix
+import Data.Typeable
+import Control.DeepSeq
+import System.IO.Unsafe (unsafePerformIO)
 
+import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 
@@ -70,4 +75,12 @@ queueIOAndWait r f = do
     freeStablePtr d
     return x
 
-
+deriving instance Typeable RunLoop
+instance NFData RunLoop
+-- | 'Eq' defined on the underlying pointer
+deriving instance Eq RunLoop
+-- | 'Ord' defined on the underlying pointer
+deriving instance Ord RunLoop
+-- | 'Show' defined using 'getObjectDescription'
+instance Show RunLoop where
+  show = unsafePerformIO . getObjectDescription

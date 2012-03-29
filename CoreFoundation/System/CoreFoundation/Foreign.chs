@@ -5,6 +5,7 @@ module System.CoreFoundation.Foreign(
                 CFType,
                 CFTypeRef,
                 withObject,
+                withDynObject,
                 withVoidObject,
                 withMaybeObject,
                 withObjects,
@@ -93,6 +94,10 @@ Core Foundation API functions.
 -- It is not safe in general to use the 'CFTypeRef' after the action completes.
 withObject :: Object a => a -> (Ptr (Repr a) -> IO b) -> IO b
 withObject = withForeignPtr . unsafeUnObject
+
+-- | 'withObject', but with a pointer cast
+withDynObject :: Object a => a -> (Ptr CFType -> IO b) -> IO b
+withDynObject a k = withObject a (k . castPtr)
 
 -- | Like 'withObject', except that if the input is Nothing, the action will be passed a 'nullPtr'.
 withMaybeObject :: Object a => Maybe a -> (Ptr (Repr a) -> IO b) -> IO b

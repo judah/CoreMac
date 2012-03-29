@@ -11,11 +11,15 @@ module System.CoreFoundation.Bundle(
 
 import Foreign.C.Types
 
+import System.IO.Unsafe (unsafePerformIO)
 import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
+import System.CoreFoundation.Base
 {#import System.CoreFoundation.URL#}
 {#import System.CoreFoundation.String#}
 import Prelude hiding (String)
+import Data.Typeable
+import Control.DeepSeq
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -47,3 +51,10 @@ getAuxiliaryExecutableURL bundle str = getOwned $ cfGetAuxiliaryExecutableURL bu
 
 getResourceURL :: Bundle -> String -> Maybe String -> Maybe String -> IO URL
 getResourceURL a b c d = getOwned $ cfGetResourceURL a b c d
+
+deriving instance Typeable Bundle
+instance NFData Bundle
+deriving instance Eq Bundle
+deriving instance Ord Bundle
+instance Show Bundle where
+  show = unsafePerformIO . getObjectDescription

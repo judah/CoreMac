@@ -14,6 +14,8 @@ import System.CoreFoundation.Foreign
 import System.CoreFoundation.Internal.TH
 {#import System.CoreFoundation.String#}
 import Prelude hiding (String)
+import Data.Typeable
+import Control.DeepSeq
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -39,3 +41,10 @@ fileSystemPath url style = unsafePerformIO $ getOwned $ cfFileSystemPath url sty
 
 absoluteURL :: URL -> URL
 absoluteURL url = unsafePerformIO $ getOwned $ cfAbsoluteURL url
+
+deriving instance Typeable URL
+instance NFData URL
+instance Eq URL where
+  a == b = equal a b
+instance Show URL where
+  show = unsafePerformIO . getObjectDescription

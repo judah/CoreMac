@@ -27,12 +27,16 @@ import System.CoreFoundation.Internal.Unsafe(TypeID(..))
 import Data.Maybe (fromMaybe)
 import qualified Data.Vector as V
 
+import Data.Typeable
+import Control.DeepSeq
+
 -- | The opaque CoreFoundation @CFArray@ type.
 data CFArray
 {- | 
 Arrays of pointers. Wraps the @CFArrayRef@ type.
 -}
 newtype Array a = Array { unArray :: ForeignPtr CFArray }
+  deriving (Typeable)
 {#pointer CFArrayRef as ArrayRef -> CFArray#}
 
 instance Object (Array a) where
@@ -112,3 +116,13 @@ arrays, which ensures that the resulting 'ArrayRef' is non-null.
 -}
 getOwnedArray :: Object a => IO ArrayRef -> IO (Array a)
 getOwnedArray = fmap (fromMaybe (fromVector V.empty)) . maybeGetOwned
+
+-- instances
+instance (Object a, Show a) => Show (Array a) where
+  show = show . toVector
+instance (Object a, Eq a) => Eq (Array a) where
+  a == b = toVector a == toVector b
+instance (Object a, Ord a) => Ord (Array a) where
+  compare a b = compare (toVector a) (toVector b)
+-- | For CoreFoundation 'Array's, 'seq' and 'deepSeq' are the same
+instance (Object a, NFData a) => NFData (Array a)

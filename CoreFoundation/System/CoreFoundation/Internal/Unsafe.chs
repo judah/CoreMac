@@ -6,6 +6,8 @@ import Foreign.ForeignPtr
 import Foreign.C
 import Foreign.Marshal.Array (allocaArray)
 import System.IO.Unsafe (unsafePerformIO)
+import Data.Typeable
+import Control.DeepSeq
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -24,7 +26,12 @@ class Object a where
 
 type CFTypeID = {#type CFTypeID#}
 newtype TypeID = TypeID {unsafeUnTypeID :: CFTypeID}
-            deriving Eq
+            deriving (Eq, Ord, Typeable)
+
+instance NFData TypeID
+
+instance Show TypeID where
+  show = typeIDDescription
 
 class Object a => StaticTypeID a where
     unsafeStaticTypeID :: a -> TypeID
@@ -76,6 +83,7 @@ type CBoolean = {#type Boolean #}
 -- In contrast, we use the Haskell types @Data@ and @String@ to indicate objects which
 -- are known to be immutable.
 newtype Mutable s o = Mutable o
+  deriving (Typeable, NFData)
 
 -- | @Repr (Mutable s o) = MutableRep (Repr o)@
 data MutableRepr repr

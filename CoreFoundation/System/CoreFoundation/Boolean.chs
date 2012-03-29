@@ -15,6 +15,8 @@ import System.CoreFoundation.Internal.TH
 import System.IO.Unsafe (unsafePerformIO)
 import qualified Foreign
 import Foreign.C.Types
+import Data.Typeable
+import Control.DeepSeq
 
 declareCFType "Boolean"
 {#pointer CFBooleanRef as BooleanRef nocode#}
@@ -34,3 +36,12 @@ kFalse = unsafePerformIO $ getAndRetain kCFBooleanFalse
 
 foreign import ccall "&" kCFBooleanTrue :: BooleanRef
 foreign import ccall "&" kCFBooleanFalse :: BooleanRef
+
+deriving instance Typeable Boolean
+instance Show Boolean where
+  show = show . toBool
+instance Eq Boolean where
+  a == b = toBool a == toBool b
+instance Ord Boolean where
+  compare a b = compare (toBool a) (toBool b)
+instance NFData Boolean

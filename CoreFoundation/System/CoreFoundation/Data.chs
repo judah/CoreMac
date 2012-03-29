@@ -19,8 +19,12 @@ import Foreign.C
 import System.IO.Unsafe (unsafePerformIO)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Unsafe as UnsafeB
+import           Data.ByteString.Char8()
 import Control.Exception (finally)
 import Data.Word (Word8)
+import Data.Typeable
+import Data.String
+import Control.DeepSeq
 
 import System.CoreFoundation.Base
 import System.CoreFoundation.Foreign
@@ -31,7 +35,6 @@ import System.CoreFoundation.Internal.TH
 
 declareCFType "Data"
 {#pointer CFDataRef as DataRef nocode#}
-
 
 {#fun unsafe CFDataGetBytePtr as getBytePtr
     { withObject* `Data'
@@ -65,3 +68,14 @@ getByteString d = unsafePerformIO $ withData d $ \p n -> B.packCStringLen (castP
 fromByteString :: B.ByteString -> Data
 fromByteString b = unsafePerformIO $ UnsafeB.unsafeUseAsCStringLen b $ \(p,len) ->
                         getOwned $ cfCreateData (castPtr p) (toEnum len)
+
+deriving instance Typeable Data
+instance Show Data where
+  show = show . getByteString
+instance Eq Data where
+  a == b = getByteString a == getByteString b
+instance Ord Data where
+  compare a b = compare (getByteString a) (getByteString b)
+instance IsString Data where
+  fromString = fromByteString . fromString
+instance NFData Data
