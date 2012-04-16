@@ -5,6 +5,7 @@ module System.CoreFoundation.Error (
             -- $error
             Error,
             ErrorRef,
+            CFError,
             mkError,
             ErrorCode,
             -- * Error properties

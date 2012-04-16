@@ -1,6 +1,8 @@
 module System.CoreFoundation.Base(
                 -- * Core Foundation Objects
                 Object(..),
+                CFType,
+                CFTypeRef,
                 touchObject,
                 getObjectDescription,
                 hash,

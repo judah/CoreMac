@@ -2,6 +2,7 @@
 module System.CoreGraphics.DataProvider(
                     DataProvider,
                     DataProviderRef,
+                    CGDataProvider,
                     newDataProviderFromFile,
                     ) where
 

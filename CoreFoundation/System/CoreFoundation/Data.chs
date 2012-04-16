@@ -2,6 +2,7 @@
 module System.CoreFoundation.Data(
                 Data,
                 DataRef,
+                CFData,
                 getLength,
                 fromByteString,
                 getByteString,

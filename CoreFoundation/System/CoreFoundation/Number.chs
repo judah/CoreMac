@@ -4,6 +4,7 @@ module System.CoreFoundation.Number(
                 -- * Types
                 Number,
                 NumberRef,
+                CFNumber,
                 -- * Converting to basic types
                 number,
                 value,

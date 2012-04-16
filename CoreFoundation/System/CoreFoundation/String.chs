@@ -2,6 +2,7 @@
 module System.CoreFoundation.String(
                 String,
                 StringRef,
+                CFString,
                 -- * Conversion to/from 'Data'
                 encode,
                 decode,

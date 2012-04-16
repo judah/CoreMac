@@ -5,6 +5,7 @@ module System.CoreFoundation.Date(
   -- ** Date
   Date,
   DateRef,
+  CFDate,
   -- ** AbsoluteTime
   AbsoluteTime(..),
   -- * Conversions

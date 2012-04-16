@@ -2,6 +2,7 @@
 module System.CoreFoundation.Dictionary(
                     Dictionary,
                     DictionaryRef,
+                    CFDictionary,
                     -- * Accessing elements
                     size,
                     lookup,

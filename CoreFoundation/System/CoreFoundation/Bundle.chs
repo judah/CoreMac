@@ -3,6 +3,7 @@
 module System.CoreFoundation.Bundle(
                     Bundle,
                     BundleRef,
+                    CFBundle,
                     getMainBundle,
                     getExecutableURL,
                     getResourceURL,

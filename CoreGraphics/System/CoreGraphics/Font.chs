@@ -1,6 +1,7 @@
 module System.CoreGraphics.Font(
                     Font,
                     FontRef,
+                    CGFont,
                     newFontWithDataProvider,
                     Glyph,
                     glyphAdvances,

@@ -1,6 +1,7 @@
 module System.CoreGraphics.PDF.Document (
                         PDFDocument,
                         PDFDocumentRef,
+                        CGPDFDocument,
                         newPDFDocumentWithProvider,
                         newPDFDocumentWithURL,
                         getNumberOfPages, 

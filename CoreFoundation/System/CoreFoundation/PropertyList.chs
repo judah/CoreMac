@@ -3,6 +3,7 @@ module System.CoreFoundation.PropertyList(
   -- * Types
   Plist,
   PlistRef,
+  CFPropertyList,
   -- * CoreFoundation subtypes
   PlistElement,
   toPlist,

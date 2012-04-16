@@ -6,6 +6,7 @@ A 'NotificationCentre' object provides the means by which you can send a message
 module System.CoreFoundation.NotificationCenter (
                             NotificationCenter,
                             NotificationCenterRef,
+                            CFNotificationCenter,
                             getLocalCenter,
                             postNotification,
                                 ) where

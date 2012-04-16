@@ -3,6 +3,7 @@ module System.CoreFoundation.Boolean(
   -- * Types
   Boolean,
   BooleanRef,
+  CFBoolean,
   -- * Conversion
   toBool,
   fromBool,

@@ -1,6 +1,7 @@
 module System.CoreGraphics.Context(
                 Context,
                 ContextRef,
+                CGContext,
                 fillRect,
                 showGlyphsAtPoint,
                 setFont,

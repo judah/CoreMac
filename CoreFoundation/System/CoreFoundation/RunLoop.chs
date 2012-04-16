@@ -1,6 +1,8 @@
 -- | Core Foundation run loops.  
 module System.CoreFoundation.RunLoop(
                     RunLoop,
+                    RunLoopRef,
+                    CFRunLoop,
                     getCurrentRunLoop,
                     getMainRunLoop,
                     queueIO,

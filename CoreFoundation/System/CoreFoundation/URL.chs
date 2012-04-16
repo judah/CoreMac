@@ -2,6 +2,7 @@
 module System.CoreFoundation.URL(
                 URL,
                 URLRef,
+                CFURL,
                 -- * Converting to 'String'
                 urlFromString,
                 urlToString,
